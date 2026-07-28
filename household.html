@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heat Pump Rebate Portal - Lincoln, NE</title>
+<style>
+  :root { --blue:#1a5276; --green:#1e8449; --bg:#f7f9fa; --border:#d5dbdb; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
+         max-width:560px; margin:0 auto; padding:16px; color:#212f3c; }
+  .demo-banner { background:#f9e79f; border:1px solid #d4ac0d; padding:8px 12px;
+         border-radius:6px; font-size:13px; text-align:center; margin-bottom:16px; }
+  h1 { font-size:22px; color:var(--blue); margin:8px 0 4px; }
+  .sub { color:#5d6d7e; font-size:14px; margin-bottom:20px; }
+  .card { background:#fff; border:1px solid var(--border); border-radius:8px;
+          padding:20px; margin-bottom:16px; }
+  label { display:block; font-weight:600; font-size:14px; margin-bottom:6px; }
+  input { width:100%; padding:11px; font-size:16px; border:1px solid var(--border);
+          border-radius:6px; }
+  button { width:100%; padding:12px; font-size:16px; background:var(--blue); color:#fff;
+           border:none; border-radius:6px; cursor:pointer; margin-top:12px; }
+  button:disabled { background:#aab7b8; cursor:default; }
+  #suggestions { border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px;
+                 background:#fff; max-height:260px; overflow-y:auto; display:none; }
+  .sug { padding:10px 12px; cursor:pointer; font-size:15px; border-bottom:1px solid #eee; }
+  .sug:hover { background:#eaf2f8; }
+  .muted { color:#5d6d7e; font-size:13px; margin-top:8px; }
+  .error { color:#c0392b; font-size:14px; margin-top:10px; }
+  .nomatch { background:#fdf2e9; border:1px solid #e59866; border-radius:6px;
+             padding:12px; font-size:14px; margin-top:10px; display:none; }
+  .result { text-align:center; }
+  .tier { font-size:38px; font-weight:700; color:var(--green); margin:12px 0; }
+  .addr { font-size:15px; color:#5d6d7e; }
+  .warn { background:#fdf2e9; border:1px solid #e59866; border-radius:6px;
+          padding:10px; font-size:13px; margin-top:12px; text-align:left; }
+  .spinner { border:3px solid #eee; border-top:3px solid var(--blue); border-radius:50%;
+             width:28px; height:28px; animation:spin 1s linear infinite; margin:16px auto; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - tier assignments shown are not final</div>
+<div class="lang" style="text-align:right;font-size:14px"><a id="lang-toggle" style="color:#1a5276;cursor:pointer;text-decoration:underline">Español</a></div>
+<h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
+<p class="sub" data-i18n="subtitle">Check your household's rebate tier</p>
+
+<!-- Step 1: address search -->
+<div class="card" id="step-address">
+  <label for="q" data-i18n="addr_label">Enter your address</label>
+  <input id="q" type="text" autocomplete="off" placeholder="e.g. 9549 Hollow Tree Pl">
+  <div id="suggestions"></div>
+  <div class="nomatch" id="nomatch">
+    <span data-i18n="nomatch_text">We couldn't find this address in the program's eligible-service list. If you believe your address should be included, contact</span>
+    <strong>rebates@lincoln.ne.gov</strong>.
+  </div>
+  <p class="muted" data-i18n="addr_hint">Start typing and select your address from the list.</p>
+</div>
+
+<!-- Step 2: email -->
+<div class="card hidden" id="step-email">
+  <div class="addr" id="chosen-addr"></div>
+  <label for="email" style="margin-top:12px" data-i18n="email_label">Email address</label>
+  <input id="email" type="email" placeholder="you@example.com">
+  <button id="btn-send" data-i18n="btn_send">Send verification code</button>
+  <div class="error" id="err-email"></div>
+</div>
+
+<!-- Step 3: code -->
+<div class="card hidden" id="step-code">
+  <label for="code" data-i18n="code_label">Enter the 6-digit code sent to your email</label>
+  <input id="code" inputmode="numeric" maxlength="6" placeholder="123456">
+  <button id="btn-verify" data-i18n="btn_verify">Verify</button>
+  <div class="error" id="err-code"></div>
+</div>
+
+<!-- Loading -->
+<div class="card hidden" id="loading"><div class="spinner"></div>
+  <p style="text-align:center" id="loading-msg">Working...</p></div>
+
+<!-- Result -->
+<div class="card result hidden" id="step-result">
+  <p data-i18n="result_intro">Your household's rebate tier:</p>
+  <div class="tier" id="tier"></div>
+  <div class="addr" id="result-addr"></div>
+  <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">This address is part of a multi-family property. Program eligibility rules for multi-family buildings may differ - confirm with the program before proceeding.</div>
+  <div class="warn hidden" id="warn-new" data-i18n="warn_new">This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.</div>
+  <p class="muted" data-i18n="result_note">A record of this result has been logged. Share this screen or your confirmation email with your contractor.</p>
+</div>
+
+<script>
+// ---- Configuration: set these to your Supabase project values ----
+const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
+// ------------------------------------------------------------------
+
+const API = `${SUPABASE_URL}/functions/v1/portal-api`;
+const RPC = `${SUPABASE_URL}/rest/v1/rpc/search_premises`;
+let selected = null;   // { premise_id, display_address }
+let debounce = null;
+
+const $ = (id) => document.getElementById(id);
+const show = (id) => $(id).classList.remove("hidden");
+const hide = (id) => $(id).classList.add("hidden");
+
+// Address autocomplete against the eligible list (server-side RPC)
+$("q").addEventListener("input", () => {
+  clearTimeout(debounce);
+  const q = $("q").value.trim();
+  $("nomatch").style.display = "none";
+  if (q.length < 3) { $("suggestions").style.display = "none"; return; }
+  debounce = setTimeout(async () => {
+    const r = await fetch(RPC, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+                 Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ q }),
+    });
+    const rows = r.ok ? await r.json() : [];
+    const box = $("suggestions");
+    box.innerHTML = "";
+    if (!rows.length) {
+      box.style.display = "none";
+      $("nomatch").style.display = "block";
+      return;
+    }
+    for (const row of rows) {
+      const d = document.createElement("div");
+      d.className = "sug";
+      d.textContent = row.display_address;
+      d.onclick = () => {
+        selected = row;
+        $("chosen-addr").textContent = row.display_address;
+        box.style.display = "none";
+        hide("step-address"); show("step-email");
+      };
+      box.appendChild(d);
+    }
+    box.style.display = "block";
+  }, 250);
+});
+
+// Send verification code
+$("btn-send").addEventListener("click", async () => {
+  const email = $("email").value.trim();
+  $("err-email").textContent = "";
+  if (!selected || !email.includes("@")) {
+    $("err-email").textContent = STRINGS[lang].err_email; return;
+  }
+  $("btn-send").disabled = true;
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "send_code", public_id: selected.public_id, email }),
+  });
+  $("btn-send").disabled = false;
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    $("err-email").textContent = e.error || "Could not send code."; return;
+  }
+  hide("step-email"); show("step-code");
+});
+
+// Verify code and reveal tier
+$("btn-verify").addEventListener("click", async () => {
+  const code = $("code").value.trim();
+  $("err-code").textContent = "";
+  if (!/^\d{6}$/.test(code)) {
+    $("err-code").textContent = STRINGS[lang].err_code; return;
+  }
+  hide("step-code"); show("loading");
+  $("loading-msg").textContent = "Verifying...";
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "verify_reveal", public_id: selected.public_id,
+                           email: $("email").value.trim(), code }),
+  });
+  hide("loading");
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    show("step-code");
+    $("err-code").textContent = e.error || "Verification failed."; return;
+  }
+  const d = await r.json();
+  $("tier").textContent = d.tier;
+  $("result-addr").textContent = d.display_address;
+  if (d.flag_multifamily) show("warn-mf");
+  if (d.flag_new_construction) show("warn-new");
+  show("step-result");
+});
+
+// --- Language support (EN/ES). Spanish strings are machine-drafted and
+// --- require native-speaker review before production launch.
+const STRINGS = {
+  en: {
+    demo:"DEMO SYSTEM - tier assignments shown are not final",
+    title:"City of Lincoln Heat Pump Rebate",
+    subtitle:"Check your household's rebate tier",
+    addr_label:"Enter your address",
+    addr_hint:"Start typing and select your address from the list.",
+    nomatch_text:"We couldn't find this address in the program's eligible-service list. If you believe your address should be included, contact",
+    email_label:"Email address",
+    btn_send:"Send verification code",
+    code_label:"Enter the 6-digit code sent to your email",
+    btn_verify:"Verify",
+    result_intro:"Your household's rebate tier:",
+    warn_mf:"This address is part of a multi-family property. Program eligibility rules for multi-family buildings may differ - confirm with the program before proceeding.",
+    warn_new:"This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.",
+    result_note:"A record of this result has been logged. Share this screen or your confirmation email with your contractor.",
+    toggle:"Español",
+    err_email:"Please enter a valid email address.",
+    err_code:"Enter the 6-digit code.",
+  },
+  es: {
+    demo:"SISTEMA DE DEMOSTRACIÓN - las asignaciones mostradas no son definitivas",
+    title:"Reembolso de Bomba de Calor de la Ciudad de Lincoln",
+    subtitle:"Consulte el nivel de reembolso de su hogar",
+    addr_label:"Ingrese su dirección",
+    addr_hint:"Empiece a escribir y seleccione su dirección de la lista.",
+    nomatch_text:"No encontramos esta dirección en la lista de servicio elegible del programa. Si cree que su dirección debería estar incluida, contacte a",
+    email_label:"Correo electrónico",
+    btn_send:"Enviar código de verificación",
+    code_label:"Ingrese el código de 6 dígitos enviado a su correo",
+    btn_verify:"Verificar",
+    result_intro:"El nivel de reembolso de su hogar:",
+    warn_mf:"Esta dirección es parte de una propiedad multifamiliar. Las reglas de elegibilidad pueden diferir - confirme con el programa antes de continuar.",
+    warn_new:"Esta propiedad fue registrada recientemente y puede ser construcción nueva, la cual no es elegible para incentivos de la Ciudad de Lincoln. El programa verificará la elegibilidad.",
+    result_note:"Se ha registrado este resultado. Comparta esta pantalla o su correo de confirmación con su contratista.",
+    toggle:"English",
+    err_email:"Por favor ingrese un correo electrónico válido.",
+    err_code:"Ingrese el código de 6 dígitos.",
+  },
+};
+const params = new URLSearchParams(location.search);
+let lang = params.get("lang") === "es" ? "es" : "en";
+function applyLang() {
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-i18n]"))
+    el.textContent = STRINGS[lang][el.dataset.i18n];
+  document.getElementById("lang-toggle").textContent = STRINGS[lang].toggle;
+}
+document.getElementById("lang-toggle").onclick = () => {
+  lang = lang === "en" ? "es" : "en"; applyLang();
+};
+applyLang();
+</script>
+</body>
+</html>

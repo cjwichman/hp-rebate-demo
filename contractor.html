@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contractor Portal - Heat Pump Rebate Verification</title>
+<style>
+  :root { --blue:#1a5276; --green:#1e8449; --bg:#f7f9fa; --border:#d5dbdb; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
+         max-width:560px; margin:0 auto; padding:16px; color:#212f3c; }
+  .demo-banner { background:#f9e79f; border:1px solid #d4ac0d; padding:8px 12px;
+         border-radius:6px; font-size:13px; text-align:center; margin-bottom:16px; }
+  h1 { font-size:22px; color:var(--blue); margin:8px 0 4px; }
+  .sub { color:#5d6d7e; font-size:14px; margin-bottom:20px; }
+  .card { background:#fff; border:1px solid var(--border); border-radius:8px;
+          padding:20px; margin-bottom:16px; }
+  label { display:block; font-weight:600; font-size:14px; margin-bottom:6px; }
+  input { width:100%; padding:11px; font-size:16px; border:1px solid var(--border);
+          border-radius:6px; }
+  button { width:100%; padding:12px; font-size:16px; background:var(--blue); color:#fff;
+           border:none; border-radius:6px; cursor:pointer; margin-top:12px; }
+  #suggestions { border:1px solid var(--border); border-top:none; background:#fff;
+                 max-height:260px; overflow-y:auto; display:none; }
+  .sug { padding:10px 12px; cursor:pointer; font-size:15px; border-bottom:1px solid #eee; }
+  .sug:hover { background:#eaf2f8; }
+  .error { color:#c0392b; font-size:14px; margin-top:10px; }
+  .resbox { background:#eaf2f8; border:1px solid var(--blue); border-radius:6px;
+            padding:14px; margin-top:14px; display:none; }
+  .resbox .tier { font-size:26px; font-weight:700; color:var(--green); }
+  .warn { background:#fdf2e9; border:1px solid #e59866; border-radius:6px;
+          padding:10px; font-size:13px; margin-top:10px; }
+  .hidden { display:none; }
+  .muted { color:#5d6d7e; font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - tier assignments shown are not final</div>
+<div class="lang" style="text-align:right;font-size:14px"><a id="lang-toggle" style="color:#1a5276;cursor:pointer;text-decoration:underline">Español</a></div>
+<h1 data-i18n="title">Contractor Portal</h1>
+<p class="sub" data-i18n="subtitle">Verify a customer's rebate tier</p>
+
+<!-- Login -->
+<div class="card" id="login">
+  <label for="pw" data-i18n="pw_label">Contractor password</label>
+  <input id="pw" type="password">
+  <button id="btn-login" data-i18n="btn_login">Log in</button>
+  <div class="error" id="err-login"></div>
+  <p class="muted" data-i18n="access_note">Contact the research team if you need access.</p>
+</div>
+
+<!-- Lookup -->
+<div class="card hidden" id="lookup">
+  <label for="q" data-i18n="addr_label">Customer address</label>
+  <input id="q" type="text" autocomplete="off" placeholder="Start typing the address...">
+  <div id="suggestions"></div>
+  <div class="error" id="err-lookup"></div>
+  <div class="resbox" id="resbox">
+    <div id="res-addr" style="font-size:14px;color:#5d6d7e"></div>
+    <div class="tier" id="res-tier"></div>
+    <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">Multi-family property - eligibility rules may differ. Confirm with the program.</div>
+    <div class="warn hidden" id="warn-new" data-i18n="warn_new">Recently created premise - may be new construction, which is not eligible for City incentives.</div>
+  </div>
+  <p class="muted" data-i18n="lookup_note">Select an address from the suggestions to see its tier. The password is checked on every lookup.</p>
+</div>
+
+<script>
+// ---- Configuration: set these to your Supabase project values ----
+const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
+// ------------------------------------------------------------------
+
+const API = `${SUPABASE_URL}/functions/v1/portal-api`;
+const RPC = `${SUPABASE_URL}/rest/v1/rpc/search_premises`;
+let password = null;
+let debounce = null;
+const $ = (id) => document.getElementById(id);
+
+// The password is validated server-side on the first lookup; the login
+// screen only stores it locally for subsequent requests.
+$("btn-login").addEventListener("click", () => {
+  password = $("pw").value;
+  if (!password) { $("err-login").textContent = STRINGS[lang].err_pw; return; }
+  $("login").classList.add("hidden");
+  $("lookup").classList.remove("hidden");
+});
+
+$("q").addEventListener("input", () => {
+  clearTimeout(debounce);
+  $("resbox").style.display = "none";
+  const q = $("q").value.trim();
+  if (q.length < 3) { $("suggestions").style.display = "none"; return; }
+  debounce = setTimeout(async () => {
+    const r = await fetch(RPC, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+                 Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ q }),
+    });
+    const rows = r.ok ? await r.json() : [];
+    const box = $("suggestions");
+    box.innerHTML = "";
+    if (!rows.length) { box.style.display = "none"; return; }
+    for (const row of rows) {
+      const d = document.createElement("div");
+      d.className = "sug";
+      d.textContent = row.display_address;
+      d.onclick = () => { box.style.display = "none"; doLookup(row); };
+      box.appendChild(d);
+    }
+    box.style.display = "block";
+  }, 250);
+});
+
+async function doLookup(row) {
+  $("err-lookup").textContent = "";
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "contractor_lookup",
+                           public_id: row.public_id, password }),
+  });
+  if (r.status === 401) {
+    // Wrong password: send the user back to login
+    $("lookup").classList.add("hidden");
+    $("login").classList.remove("hidden");
+    $("err-login").textContent = STRINGS[lang].err_pw_bad;
+    return;
+  }
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    $("err-lookup").textContent = e.error || "Lookup failed.";
+    return;
+  }
+  const d = await r.json();
+  $("res-addr").textContent = d.display_address;
+  $("res-tier").textContent = d.tier + STRINGS[lang].tier_suffix;
+  $("warn-mf").classList.toggle("hidden", !d.flag_multifamily);
+  $("warn-new").classList.toggle("hidden", !d.flag_new_construction);
+  $("resbox").style.display = "block";
+}
+
+// --- Language support (EN/ES). Spanish requires native review pre-launch.
+const STRINGS = {
+  en: {
+    demo:"DEMO SYSTEM - tier assignments shown are not final",
+    title:"Contractor Portal",
+    subtitle:"Verify a customer's rebate tier",
+    pw_label:"Contractor password",
+    btn_login:"Log in",
+    access_note:"Contact the research team if you need access.",
+    addr_label:"Customer address",
+    warn_mf:"Multi-family property - eligibility rules may differ. Confirm with the program.",
+    warn_new:"Recently created premise - may be new construction, which is not eligible for City incentives.",
+    lookup_note:"Select an address from the suggestions to see its tier. The password is checked on every lookup.",
+    toggle:"Español",
+    err_pw:"Enter the password.",
+    err_pw_bad:"Invalid password.",
+    tier_suffix:" tier",
+  },
+  es: {
+    demo:"SISTEMA DE DEMOSTRACIÓN - las asignaciones mostradas no son definitivas",
+    title:"Portal de Contratistas",
+    subtitle:"Verifique el nivel de reembolso de un cliente",
+    pw_label:"Contraseña de contratista",
+    btn_login:"Iniciar sesión",
+    access_note:"Contacte al equipo de investigación si necesita acceso.",
+    addr_label:"Dirección del cliente",
+    warn_mf:"Propiedad multifamiliar - las reglas de elegibilidad pueden diferir. Confirme con el programa.",
+    warn_new:"Propiedad registrada recientemente - puede ser construcción nueva, no elegible para incentivos de la Ciudad.",
+    lookup_note:"Seleccione una dirección de las sugerencias para ver su nivel. La contraseña se verifica en cada consulta.",
+    toggle:"English",
+    err_pw:"Ingrese la contraseña.",
+    err_pw_bad:"Contraseña inválida.",
+    tier_suffix:" (nivel)",
+  },
+};
+const params = new URLSearchParams(location.search);
+let lang = params.get("lang") === "es" ? "es" : "en";
+function applyLang() {
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-i18n]"))
+    el.textContent = STRINGS[lang][el.dataset.i18n];
+  document.getElementById("lang-toggle").textContent = STRINGS[lang].toggle;
+}
+document.getElementById("lang-toggle").onclick = () => {
+  lang = lang === "en" ? "es" : "en"; applyLang();
+};
+applyLang();
+</script>
+</body>
+</html>

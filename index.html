@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heat Pump Rebate Portal - Lincoln, NE</title>
+<style>
+  :root { --blue:#1a5276; --bg:#f7f9fa; --border:#d5dbdb; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
+         max-width:560px; margin:0 auto; padding:16px; color:#212f3c; }
+  .demo-banner { background:#f9e79f; border:1px solid #d4ac0d; padding:8px 12px;
+         border-radius:6px; font-size:13px; text-align:center; margin-bottom:16px; }
+  .lang { text-align:right; font-size:14px; margin-bottom:4px; }
+  .lang a { color:var(--blue); cursor:pointer; text-decoration:underline; }
+  h1 { font-size:24px; color:var(--blue); margin:8px 0 4px; }
+  .sub { color:#5d6d7e; font-size:15px; margin-bottom:24px; }
+  .choice { display:block; background:#fff; border:1px solid var(--border);
+            border-radius:8px; padding:22px; margin-bottom:16px; text-decoration:none;
+            color:inherit; }
+  .choice:hover { border-color:var(--blue); }
+  .choice h2 { margin:0 0 6px; font-size:18px; color:var(--blue); }
+  .choice p { margin:0; font-size:14px; color:#5d6d7e; }
+</style>
+</head>
+<body>
+
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - tier assignments shown are not final</div>
+<div class="lang"><a id="lang-toggle">Español</a></div>
+
+<h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
+<p class="sub" data-i18n="subtitle">Choose how you'd like to use this portal</p>
+
+<a class="choice" href="household.html">
+  <h2 data-i18n="hh_title">I'm a homeowner or resident</h2>
+  <p data-i18n="hh_desc">Check your household's rebate tier by verifying your address and email.</p>
+</a>
+
+<a class="choice" href="contractor.html">
+  <h2 data-i18n="co_title">I'm a contractor</h2>
+  <p data-i18n="co_desc">Log in to verify a customer's rebate tier before installation.</p>
+</a>
+
+<script>
+// Two-language string dictionary. The Spanish text is machine-drafted and
+// should be reviewed by a native speaker before production launch.
+const STRINGS = {
+  en: {
+    demo: "DEMO SYSTEM - tier assignments shown are not final",
+    title: "City of Lincoln Heat Pump Rebate",
+    subtitle: "Choose how you'd like to use this portal",
+    hh_title: "I'm a homeowner or resident",
+    hh_desc: "Check your household's rebate tier by verifying your address and email.",
+    co_title: "I'm a contractor",
+    co_desc: "Log in to verify a customer's rebate tier before installation.",
+    toggle: "Español",
+  },
+  es: {
+    demo: "SISTEMA DE DEMOSTRACIÓN - las asignaciones mostradas no son definitivas",
+    title: "Reembolso de Bomba de Calor de la Ciudad de Lincoln",
+    subtitle: "Elija cómo desea usar este portal",
+    hh_title: "Soy propietario o residente",
+    hh_desc: "Consulte el nivel de reembolso de su hogar verificando su dirección y correo electrónico.",
+    co_title: "Soy contratista",
+    co_desc: "Inicie sesión para verificar el nivel de reembolso de un cliente antes de la instalación.",
+    toggle: "English",
+  },
+};
+
+// Language persists across pages via localStorage-free URL param to keep
+// artifacts working everywhere: ?lang=es
+const params = new URLSearchParams(location.search);
+let lang = params.get("lang") === "es" ? "es" : "en";
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-i18n]")) {
+    el.textContent = STRINGS[lang][el.dataset.i18n];
+  }
+  document.getElementById("lang-toggle").textContent = STRINGS[lang].toggle;
+  // Carry the language into the portal links
+  for (const a of document.querySelectorAll("a.choice")) {
+    const base = a.getAttribute("href").split("?")[0];
+    a.setAttribute("href", lang === "es" ? `${base}?lang=es` : base);
+  }
+}
+document.getElementById("lang-toggle").onclick = () => {
+  lang = lang === "en" ? "es" : "en";
+  applyLang();
+};
+applyLang();
+</script>
+</body>
+</html>

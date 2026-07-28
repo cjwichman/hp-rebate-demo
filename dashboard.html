@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Dashboard - Heat Pump Rebate Portal</title>
+<style>
+  :root { --blue:#1a5276; --green:#1e8449; --bg:#f7f9fa; --border:#d5dbdb; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
+         max-width:860px; margin:0 auto; padding:16px; color:#212f3c; }
+  h1 { font-size:22px; color:var(--blue); margin:8px 0 16px; }
+  .card { background:#fff; border:1px solid var(--border); border-radius:8px;
+          padding:20px; margin-bottom:16px; }
+  label { display:block; font-weight:600; font-size:14px; margin-bottom:6px; }
+  input { width:100%; padding:11px; font-size:16px; border:1px solid var(--border);
+          border-radius:6px; }
+  button { padding:11px 20px; font-size:15px; background:var(--blue); color:#fff;
+           border:none; border-radius:6px; cursor:pointer; margin-top:12px; }
+  .error { color:#c0392b; font-size:14px; margin-top:10px; }
+  .hidden { display:none; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .stat { background:#eaf2f8; border-radius:6px; padding:14px; text-align:center; }
+  .stat .n { font-size:28px; font-weight:700; color:var(--blue); }
+  .stat .l { font-size:12px; color:#5d6d7e; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid #eee; }
+  th { color:#5d6d7e; font-weight:600; }
+  .bar-row { display:flex; align-items:center; gap:8px; font-size:12px; margin:2px 0; }
+  .bar { background:var(--blue); height:14px; border-radius:2px; }
+  .muted { color:#5d6d7e; font-size:13px; }
+  h2 { font-size:16px; margin:4px 0 8px; color:var(--blue); }
+</style>
+</head>
+<body>
+
+<h1>Research Dashboard <span class="muted" style="font-weight:normal">(last 14 days - refresh page to update)</span></h1>
+
+<div class="card" id="login">
+  <label for="pw">Dashboard password</label>
+  <input id="pw" type="password">
+  <button id="btn-login">View dashboard</button>
+  <div class="error" id="err"></div>
+</div>
+
+<div class="hidden" id="dash">
+  <div class="card">
+    <h2>Household funnel</h2>
+    <div class="grid">
+      <div class="stat"><div class="n" id="s-searches">-</div><div class="l">Searches</div></div>
+      <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">No-match searches</div></div>
+      <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Codes sent</div></div>
+      <div class="stat"><div class="n" id="s-reveals">-</div><div class="l">Tier reveals</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Assignments revealed</h2>
+    <div class="grid">
+      <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard</div></div>
+      <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced</div></div>
+      <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor lookups</div></div>
+      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed code entries</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Daily tier reveals</h2>
+    <div id="daily"></div>
+  </div>
+
+  <div class="card">
+    <h2>Recent failed address searches</h2>
+    <p class="muted">High volume here signals a coverage gap in the eligible list.</p>
+    <table id="failed"><thead><tr><th>Query</th><th>When</th></tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<script>
+// ---- Configuration: set these to your Supabase project values ----
+const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
+// ------------------------------------------------------------------
+
+const API = `${SUPABASE_URL}/functions/v1/portal-api`;
+const $ = (id) => document.getElementById(id);
+
+$("btn-login").addEventListener("click", async () => {
+  $("err").textContent = "";
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "dashboard_stats", password: $("pw").value }),
+  });
+  if (!r.ok) { $("err").textContent = "Invalid password or request failed."; return; }
+  const d = await r.json();
+
+  $("login").classList.add("hidden");
+  $("dash").classList.remove("hidden");
+
+  $("s-searches").textContent = d.searches;
+  $("s-nomatch").textContent = d.searches_no_match;
+  $("s-codes").textContent = d.codes_sent;
+  $("s-reveals").textContent = d.reveals;
+  $("s-standard").textContent = d.reveals_standard;
+  $("s-enhanced").textContent = d.reveals_enhanced;
+  $("s-contractor").textContent = d.contractor_lookups;
+  $("s-codefail").textContent = d.codes_failed;
+
+  // Daily reveal bars (simple horizontal bars, no chart library needed)
+  const days = Object.keys(d.daily_reveals).sort();
+  const max = Math.max(1, ...Object.values(d.daily_reveals));
+  $("daily").innerHTML = days.length
+    ? days.map((day) => {
+        const n = d.daily_reveals[day];
+        return `<div class="bar-row"><span style="width:80px">${day}</span>
+                <div class="bar" style="width:${(n / max) * 70}%"></div>
+                <span>${n}</span></div>`;
+      }).join("")
+    : '<p class="muted">No reveals yet.</p>';
+
+  const tb = $("failed").querySelector("tbody");
+  tb.innerHTML = (d.recent_failed_queries || [])
+    .map((f) => `<tr><td>${f.q ?? ""}</td><td>${(f.at ?? "").slice(0, 16).replace("T", " ")}</td></tr>`)
+    .join("") || '<tr><td colspan="2" class="muted">None</td></tr>';
+});
+</script>
+</body>
+</html>
