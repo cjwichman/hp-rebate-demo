@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research Dashboard - Heat Pump Rebate Portal</title>
 <style>
-  :root { --blue:#1a5276; --green:#1e8449; --bg:#f7f9fa; --border:#d5dbdb; }
+  :root { --blue:#155e75; --green:#15803d; --bg:#f4f6f8; --border:#e2e8f0; }
   * { box-sizing:border-box; }
   body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
          max-width:860px; margin:0 auto; padding:16px; color:#212f3c; }
@@ -45,33 +45,33 @@
 
 <div class="hidden" id="dash">
   <div class="card">
-    <h2>Household funnel</h2>
+    <h2>Household portal activity (search &rarr; verify &rarr; view)</h2>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-searches">-</div><div class="l">Searches</div></div>
-      <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">No-match searches</div></div>
-      <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Codes sent</div></div>
-      <div class="stat"><div class="n" id="s-reveals">-</div><div class="l">Tier reveals</div></div>
+      <div class="stat"><div class="n" id="s-searches">-</div><div class="l">Address searches run</div></div>
+      <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">Searches with no eligible match</div></div>
+      <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Verification codes requested</div></div>
+      <div class="stat"><div class="n" id="s-reveals">-</div><div class="l">Rebate results viewed</div></div>
     </div>
   </div>
 
   <div class="card">
-    <h2>Assignments revealed</h2>
+    <h2>Rebate results viewed, by assignment</h2>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard</div></div>
-      <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced</div></div>
-      <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor lookups</div></div>
-      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed code entries</div></div>
+      <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard rebate viewed</div></div>
+      <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced rebate viewed</div></div>
+      <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor rebate lookups</div></div>
+      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed verification codes</div></div>
     </div>
   </div>
 
   <div class="card">
-    <h2>Daily tier reveals</h2>
+    <h2>Rebate results viewed per day</h2>
     <div id="daily"></div>
   </div>
 
   <div class="card">
-    <h2>Recent failed address searches</h2>
-    <p class="muted">High volume here signals a coverage gap in the eligible list.</p>
+    <h2>Recent searches with no eligible match</h2>
+    <p class="muted">These are addresses users tried that are not in the eligible list. High volume signals a coverage gap or out-of-city demand.</p>
     <table id="failed"><thead><tr><th>Query</th><th>When</th></tr></thead><tbody></tbody></table>
   </div>
 </div>
@@ -118,7 +118,7 @@ $("btn-login").addEventListener("click", async () => {
                 <div class="bar" style="width:${(n / max) * 70}%"></div>
                 <span>${n}</span></div>`;
       }).join("")
-    : '<p class="muted">No reveals yet.</p>';
+    : '<p class="muted">No rebate results viewed yet.</p>';
 
   const tb = $("failed").querySelector("tbody");
   tb.innerHTML = (d.recent_failed_queries || [])

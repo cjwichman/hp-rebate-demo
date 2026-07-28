@@ -5,64 +5,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heat Pump Rebate Portal - Lincoln, NE</title>
 <style>
-  :root { --blue:#1a5276; --green:#1e8449; --bg:#f7f9fa; --border:#d5dbdb; }
-  * { box-sizing:border-box; }
-  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
-         max-width:560px; margin:0 auto; padding:16px; color:#212f3c; }
-  .demo-banner { background:#f9e79f; border:1px solid #d4ac0d; padding:8px 12px;
-         border-radius:6px; font-size:13px; text-align:center; margin-bottom:16px; }
-  h1 { font-size:22px; color:var(--blue); margin:8px 0 4px; }
-  .sub { color:#5d6d7e; font-size:14px; margin-bottom:20px; }
-  .card { background:#fff; border:1px solid var(--border); border-radius:8px;
-          padding:20px; margin-bottom:16px; }
-  label { display:block; font-weight:600; font-size:14px; margin-bottom:6px; }
-  input { width:100%; padding:11px; font-size:16px; border:1px solid var(--border);
-          border-radius:6px; }
-  button { width:100%; padding:12px; font-size:16px; background:var(--blue); color:#fff;
-           border:none; border-radius:6px; cursor:pointer; margin-top:12px; }
-  button:disabled { background:#aab7b8; cursor:default; }
-  #suggestions { border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px;
-                 background:#fff; max-height:260px; overflow-y:auto; display:none; }
-  .sug { padding:10px 12px; cursor:pointer; font-size:15px; border-bottom:1px solid #eee; }
-  .sug:hover { background:#eaf2f8; }
-  .muted { color:#5d6d7e; font-size:13px; margin-top:8px; }
-  .error { color:#c0392b; font-size:14px; margin-top:10px; }
-  .nomatch { background:#fdf2e9; border:1px solid #e59866; border-radius:6px;
-             padding:12px; font-size:14px; margin-top:10px; display:none; }
+  :root {
+    --blue:#155e75; --blue-dark:#0e4a5c; --green:#15803d;
+    --bg:#f4f6f8; --card:#ffffff; --border:#e2e8f0; --text:#1e293b;
+    --muted:#64748b; --ring:rgba(21,94,117,.25);
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+         background:var(--bg); color:var(--text); max-width:520px; margin:0 auto;
+         padding:20px 16px 48px; line-height:1.5; }
+  .topbar { display:flex; justify-content:space-between; align-items:center;
+            font-size:14px; margin-bottom:12px; }
+  .topbar a { color:var(--blue); text-decoration:none; cursor:pointer; }
+  .topbar a:hover { text-decoration:underline; }
+  .demo-banner { background:#fef9c3; border:1px solid #eab308; color:#713f12;
+         padding:8px 14px; border-radius:8px; font-size:13px; text-align:center;
+         margin-bottom:14px; }
+  h1 { font-size:22px; font-weight:700; color:var(--blue); letter-spacing:-0.01em; }
+  .sub { color:var(--muted); font-size:14px; margin:4px 0 20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+          padding:22px; margin-bottom:16px; box-shadow:0 1px 3px rgba(15,23,42,.06); }
+  label { display:block; font-weight:600; font-size:14px; margin-bottom:8px; }
+  input { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--border);
+          border-radius:8px; background:#fff; transition:border-color .15s, box-shadow .15s; }
+  input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px var(--ring); }
+  button { width:100%; padding:12px; font-size:16px; font-weight:600; background:var(--blue);
+           color:#fff; border:none; border-radius:8px; cursor:pointer; margin-top:14px;
+           transition:background .15s; }
+  button:hover { background:var(--blue-dark); }
+  button:disabled { background:#94a3b8; cursor:default; }
+  #suggestions { border:1px solid var(--border); border-radius:8px; background:#fff;
+                 max-height:280px; overflow-y:auto; display:none; margin-top:6px;
+                 box-shadow:0 4px 12px rgba(15,23,42,.08); }
+  .sug { padding:11px 14px; cursor:pointer; font-size:15px; }
+  .sug + .sug { border-top:1px solid #f1f5f9; }
+  .sug:hover, .sug.active { background:#e8f1f5; }
+  .muted { color:var(--muted); font-size:13px; margin-top:10px; }
+  .error { color:#b91c1c; font-size:14px; margin-top:10px; }
+  .nomatch { background:#fff7ed; border:1px solid #fdba74; color:#7c2d12;
+             border-radius:8px; padding:12px 14px; font-size:14px; margin-top:10px;
+             display:none; }
   .result { text-align:center; }
-  .tier { font-size:38px; font-weight:700; color:var(--green); margin:12px 0; }
-  .addr { font-size:15px; color:#5d6d7e; }
-  .warn { background:#fdf2e9; border:1px solid #e59866; border-radius:6px;
-          padding:10px; font-size:13px; margin-top:12px; text-align:left; }
-  .spinner { border:3px solid #eee; border-top:3px solid var(--blue); border-radius:50%;
-             width:28px; height:28px; animation:spin 1s linear infinite; margin:16px auto; }
+  .tier { font-size:36px; font-weight:700; color:var(--green); margin:14px 0; }
+  .addr { font-size:15px; color:var(--muted); }
+  .warn { background:#fff7ed; border:1px solid #fdba74; color:#7c2d12; border-radius:8px;
+          padding:10px 14px; font-size:13px; margin-top:12px; text-align:left; }
+  .spinner { border:3px solid #e2e8f0; border-top:3px solid var(--blue); border-radius:50%;
+             width:28px; height:28px; animation:spin .9s linear infinite; margin:16px auto; }
   @keyframes spin { to { transform:rotate(360deg); } }
   .hidden { display:none; }
+  table.amounts { width:100%; border-collapse:collapse; margin:14px 0 4px; text-align:left; }
+  table.amounts td { padding:9px 4px; border-bottom:1px solid #f1f5f9; font-size:14px; }
+  table.amounts td.amt { text-align:right; font-weight:700; color:var(--green);
+                         white-space:nowrap; font-size:16px; }
+  .lmi { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; border-radius:8px;
+         padding:10px 14px; font-size:13px; margin-top:12px; text-align:left; }
+  .links { font-size:13px; margin-top:12px; }
+  .links a { color:var(--blue); }
+  details { font-size:13px; color:var(--muted); text-align:left; }
+  details summary { cursor:pointer; color:var(--blue); font-weight:600; }
+  details ul { margin:6px 0 10px 18px; padding:0; }
+  details li { margin-bottom:5px; }
+  .elig { background:var(--card); border:1px solid var(--border); border-radius:12px;
+          padding:14px 18px; margin-bottom:16px; box-shadow:0 1px 3px rgba(15,23,42,.06); }
+  .elig-h { font-weight:700; color:var(--text); margin:10px 0 2px; }
+  .elig p { margin:4px 0; }
 </style>
 </head>
 <body>
 
-<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - tier assignments shown are not final</div>
-<div class="lang" style="text-align:right;font-size:14px"><a id="lang-toggle" style="color:#1a5276;cursor:pointer;text-decoration:underline">Español</a></div>
+<div class="topbar">
+  <a id="home-link" href="index.html" data-i18n="home">&larr; Home</a>
+  <a id="lang-toggle">Español (beta)</a>
+</div>
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - results shown are not final</div>
+
 <h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
-<p class="sub" data-i18n="subtitle">Check your household's rebate tier</p>
+<p class="sub" data-i18n="subtitle">Enter your address to see your eligible rebate amount</p>
+
+<!-- Eligibility details (exact City of Lincoln program language) -->
+<details class="elig">
+  <summary data-i18n="elig_summary">Program eligibility details</summary>
+  <p class="elig-h" data-i18n="elig_who_h">Who is eligible:</p>
+  <p data-i18n="elig_who_intro">Residents of the City of Lincoln who:</p>
+  <ul>
+    <li data-i18n="elig_who_1">Live in or own and rent out a single-family detached home (rental units not eligible for the LMI incentive)</li>
+    <li data-i18n="elig_who_2">Live in and own a row home, town home, condo, or duplex</li>
+  </ul>
+  <p class="elig-h" data-i18n="elig_what_h">What is eligible:</p>
+  <ul>
+    <li data-i18n="elig_what_1">The purchase and installation of air source heat pumps or mini-split heat pumps</li>
+    <li data-i18n="elig_what_2">Heat pumps must replace an existing heat pump or central air conditioner that is at least five years old. Window air conditioners are also eligible for replacement with a heat pump when the property has no central air conditioning. A heat pump may be paired with either a gas or electric furnace.</li>
+    <li data-i18n="elig_what_3">Heat pump must be inverter driven or have a minimum SEER2 (Seasonal Energy Efficiency Rating) of 15.2 and a minimum EER2 (Energy Efficiency Ratio) of 12</li>
+  </ul>
+  <p class="elig-h" data-i18n="elig_not_h">What is not eligible:</p>
+  <ul>
+    <li data-i18n="elig_not_1">Any residence outside of Lincoln city limits</li>
+    <li data-i18n="elig_not_2">Commercial property, including multi-family housing</li>
+    <li data-i18n="elig_not_3">Row homes, town homes, condos, and duplexes if the unit is renter occupied</li>
+    <li data-i18n="elig_not_4">Ground source heat pumps</li>
+    <li data-i18n="elig_not_5">New residential construction</li>
+    <li data-i18n="elig_not_6">Mobile homes</li>
+    <li data-i18n="elig_not_7">More than one heat pump per household per City program year (Sept 1-Aug 31)</li>
+    <li data-i18n="elig_not_8">Installation of a new heat pump without replacement of an older system</li>
+  </ul>
+  <p><a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="elig_more">Full program details - City of Lincoln Heat Pump Incentives</a></p>
+</details>
 
 <!-- Step 1: address search -->
 <div class="card" id="step-address">
   <label for="q" data-i18n="addr_label">Enter your address</label>
   <input id="q" type="text" autocomplete="off" placeholder="e.g. 9549 Hollow Tree Pl">
-  <div id="suggestions"></div>
+  <div id="suggestions" role="listbox"></div>
   <div class="nomatch" id="nomatch">
     <span data-i18n="nomatch_text">We couldn't find this address in the program's eligible-service list. If you believe your address should be included, contact</span>
     <strong>rebates@lincoln.ne.gov</strong>.
   </div>
-  <p class="muted" data-i18n="addr_hint">Start typing and select your address from the list.</p>
+  <p class="muted" data-i18n="addr_hint">Start typing, then choose your address from the list (arrow keys or click).</p>
 </div>
 
 <!-- Step 2: email -->
 <div class="card hidden" id="step-email">
   <div class="addr" id="chosen-addr"></div>
-  <label for="email" style="margin-top:12px" data-i18n="email_label">Email address</label>
+  <label for="email" style="margin-top:14px" data-i18n="email_label">Email address</label>
   <input id="email" type="email" placeholder="you@example.com">
   <button id="btn-send" data-i18n="btn_send">Send verification code</button>
   <div class="error" id="err-email"></div>
@@ -82,9 +147,22 @@
 
 <!-- Result -->
 <div class="card result hidden" id="step-result">
-  <p data-i18n="result_intro">Your household's rebate tier:</p>
-  <div class="tier" id="tier"></div>
+  <p data-i18n="result_intro">Your household's eligible incentive amounts:</p>
   <div class="addr" id="result-addr"></div>
+  <table class="amounts">
+    <tr><td data-i18n="row_les">LES incentive (available to all LES customers installing high-efficiency heat pumps)</td>
+        <td class="amt">$1,000</td></tr>
+    <tr><td data-i18n="row_ac">City of Lincoln incentive - heat pump replacing a central air conditioner</td>
+        <td class="amt" id="amt-ac"></td></tr>
+    <tr><td data-i18n="row_hp">City of Lincoln incentive - heat pump replacing an existing heat pump</td>
+        <td class="amt" id="amt-hp"></td></tr>
+  </table>
+  <div class="lmi"><span data-i18n="lmi_note">You may instead qualify for the $3,000 low- and moderate-income City incentive if your income is equivalent to or below 80% of the Lincoln Area Median Income. Approvals must occur before the heat pump is installed, and rental units are not eligible for the LMI incentive.</span>
+    <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_link">How to verify LMI eligibility</a></div>
+  <p class="links">
+    <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
+    <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="link_city">City of Lincoln Heat Pump Incentives</a>
+  </p>
   <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">This address is part of a multi-family property. Program eligibility rules for multi-family buildings may differ - confirm with the program before proceeding.</div>
   <div class="warn hidden" id="warn-new" data-i18n="warn_new">This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.</div>
   <p class="muted" data-i18n="result_note">A record of this result has been logged. Share this screen or your confirmation email with your contractor.</p>
@@ -98,19 +176,45 @@ const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
 
 const API = `${SUPABASE_URL}/functions/v1/portal-api`;
 const RPC = `${SUPABASE_URL}/rest/v1/rpc/search_premises`;
-let selected = null;   // { premise_id, display_address }
+let selected = null;      // { public_id, display_address }
 let debounce = null;
+let sugRows = [];         // current suggestion rows
+let activeIdx = -1;       // keyboard-highlighted suggestion
 
 const $ = (id) => document.getElementById(id);
 const show = (id) => $(id).classList.remove("hidden");
 const hide = (id) => $(id).classList.add("hidden");
 
-// Address autocomplete against the eligible list (server-side RPC)
+function renderSuggestions() {
+  const box = $("suggestions");
+  box.innerHTML = "";
+  sugRows.forEach((row, i) => {
+    const d = document.createElement("div");
+    d.className = "sug" + (i === activeIdx ? " active" : "");
+    d.textContent = row.display_address;
+    // mousedown (not click) so selection wins over any focus/blur ordering
+    d.addEventListener("mousedown", (ev) => { ev.preventDefault(); choose(i); });
+    box.appendChild(d);
+  });
+  box.style.display = sugRows.length ? "block" : "none";
+}
+
+function choose(i) {
+  selected = sugRows[i];
+  $("q").value = selected.display_address;
+  $("suggestions").style.display = "none";
+  sugRows = []; activeIdx = -1;
+  $("chosen-addr").textContent = selected.display_address;
+  hide("step-address"); show("step-email");
+  $("email").focus();
+}
+
 $("q").addEventListener("input", () => {
   clearTimeout(debounce);
-  const q = $("q").value.trim();
+  selected = null;
   $("nomatch").style.display = "none";
-  if (q.length < 3) { $("suggestions").style.display = "none"; return; }
+  const q = $("q").value.trim();
+  if (q.length < 3) { sugRows = []; renderSuggestions(); return; }
   debounce = setTimeout(async () => {
     const r = await fetch(RPC, {
       method: "POST",
@@ -118,31 +222,29 @@ $("q").addEventListener("input", () => {
                  Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({ q }),
     });
-    const rows = r.ok ? await r.json() : [];
-    const box = $("suggestions");
-    box.innerHTML = "";
-    if (!rows.length) {
-      box.style.display = "none";
-      $("nomatch").style.display = "block";
-      return;
-    }
-    for (const row of rows) {
-      const d = document.createElement("div");
-      d.className = "sug";
-      d.textContent = row.display_address;
-      d.onclick = () => {
-        selected = row;
-        $("chosen-addr").textContent = row.display_address;
-        box.style.display = "none";
-        hide("step-address"); show("step-email");
-      };
-      box.appendChild(d);
-    }
-    box.style.display = "block";
+    sugRows = r.ok ? await r.json() : [];
+    activeIdx = -1;
+    renderSuggestions();
+    if (!sugRows.length) $("nomatch").style.display = "block";
   }, 250);
 });
 
-// Send verification code
+// Keyboard navigation: arrows to move, Enter to choose, Escape to close
+$("q").addEventListener("keydown", (ev) => {
+  if (!sugRows.length) return;
+  if (ev.key === "ArrowDown") {
+    ev.preventDefault(); activeIdx = Math.min(activeIdx + 1, sugRows.length - 1);
+    renderSuggestions();
+  } else if (ev.key === "ArrowUp") {
+    ev.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0);
+    renderSuggestions();
+  } else if (ev.key === "Enter" && activeIdx >= 0) {
+    ev.preventDefault(); choose(activeIdx);
+  } else if (ev.key === "Escape") {
+    sugRows = []; renderSuggestions();
+  }
+});
+
 $("btn-send").addEventListener("click", async () => {
   const email = $("email").value.trim();
   $("err-email").textContent = "";
@@ -162,9 +264,9 @@ $("btn-send").addEventListener("click", async () => {
     $("err-email").textContent = e.error || "Could not send code."; return;
   }
   hide("step-email"); show("step-code");
+  $("code").focus();
 });
 
-// Verify code and reveal tier
 $("btn-verify").addEventListener("click", async () => {
   const code = $("code").value.trim();
   $("err-code").textContent = "";
@@ -172,7 +274,7 @@ $("btn-verify").addEventListener("click", async () => {
     $("err-code").textContent = STRINGS[lang].err_code; return;
   }
   hide("step-code"); show("loading");
-  $("loading-msg").textContent = "Verifying...";
+  $("loading-msg").textContent = STRINGS[lang].loading;
   const r = await fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
@@ -187,53 +289,116 @@ $("btn-verify").addEventListener("click", async () => {
     $("err-code").textContent = e.error || "Verification failed."; return;
   }
   const d = await r.json();
-  $("tier").textContent = d.tier;
+  // City incentive amounts by assignment and replacement type
+  const CITY_AMOUNTS = {
+    Standard: { ac: "$750",   hp: "$0"   },
+    Enhanced: { ac: "$1,500", hp: "$500" },
+  };
+  const amt = CITY_AMOUNTS[d.tier] || { ac: "-", hp: "-" };
+  $("amt-ac").textContent = amt.ac;
+  $("amt-hp").textContent = amt.hp;
   $("result-addr").textContent = d.display_address;
   if (d.flag_multifamily) show("warn-mf");
   if (d.flag_new_construction) show("warn-new");
   show("step-result");
 });
 
-// --- Language support (EN/ES). Spanish strings are machine-drafted and
-// --- require native-speaker review before production launch.
+// --- Language support (EN/ES beta). Spanish strings are machine-drafted
+// --- and require native-speaker review before production launch.
 const STRINGS = {
   en: {
-    demo:"DEMO SYSTEM - tier assignments shown are not final",
+    home:"\u2190 Home",
+    demo:"DEMO SYSTEM - results shown are not final",
     title:"City of Lincoln Heat Pump Rebate",
-    subtitle:"Check your household's rebate tier",
+    subtitle:"Enter your address to see your eligible incentive amounts",
     addr_label:"Enter your address",
-    addr_hint:"Start typing and select your address from the list.",
+    addr_hint:"Start typing, then choose your address from the list (arrow keys or click).",
     nomatch_text:"We couldn't find this address in the program's eligible-service list. If you believe your address should be included, contact",
     email_label:"Email address",
     btn_send:"Send verification code",
     code_label:"Enter the 6-digit code sent to your email",
     btn_verify:"Verify",
-    result_intro:"Your household's rebate tier:",
+    result_intro:"Your household's eligible incentive amounts:",
+    row_les:"LES incentive (available to all LES customers installing high-efficiency heat pumps)",
+    row_ac:"City of Lincoln incentive - heat pump replacing a central air conditioner",
+    row_hp:"City of Lincoln incentive - heat pump replacing an existing heat pump",
+    lmi_note:"You may instead qualify for the $3,000 low- and moderate-income City incentive if your income is equivalent to or below 80% of the Lincoln Area Median Income. Approvals must occur before the heat pump is installed, and rental units are not eligible for the LMI incentive.",
+    lmi_link:"How to verify LMI eligibility",
+    link_les:"LES Sustainable Energy Program",
+    link_city:"City of Lincoln Heat Pump Incentives",
+    elig_summary:"Program eligibility details",
+    elig_who_h:"Who is eligible:",
+    elig_who_intro:"Residents of the City of Lincoln who:",
+    elig_who_1:"Live in or own and rent out a single-family detached home (rental units not eligible for the LMI incentive)",
+    elig_who_2:"Live in and own a row home, town home, condo, or duplex",
+    elig_what_h:"What is eligible:",
+    elig_what_1:"The purchase and installation of air source heat pumps or mini-split heat pumps",
+    elig_what_2:"Heat pumps must replace an existing heat pump or central air conditioner that is at least five years old. Window air conditioners are also eligible for replacement with a heat pump when the property has no central air conditioning. A heat pump may be paired with either a gas or electric furnace.",
+    elig_what_3:"Heat pump must be inverter driven or have a minimum SEER2 (Seasonal Energy Efficiency Rating) of 15.2 and a minimum EER2 (Energy Efficiency Ratio) of 12",
+    elig_not_h:"What is not eligible:",
+    elig_not_1:"Any residence outside of Lincoln city limits",
+    elig_not_2:"Commercial property, including multi-family housing",
+    elig_not_3:"Row homes, town homes, condos, and duplexes if the unit is renter occupied",
+    elig_not_4:"Ground source heat pumps",
+    elig_not_5:"New residential construction",
+    elig_not_6:"Mobile homes",
+    elig_not_7:"More than one heat pump per household per City program year (Sept 1-Aug 31)",
+    elig_not_8:"Installation of a new heat pump without replacement of an older system",
+    elig_more:"Full program details - City of Lincoln Heat Pump Incentives",
     warn_mf:"This address is part of a multi-family property. Program eligibility rules for multi-family buildings may differ - confirm with the program before proceeding.",
     warn_new:"This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.",
     result_note:"A record of this result has been logged. Share this screen or your confirmation email with your contractor.",
-    toggle:"Español",
+    toggle:"Español (beta)",
     err_email:"Please enter a valid email address.",
     err_code:"Enter the 6-digit code.",
+    loading:"Verifying...",
   },
   es: {
-    demo:"SISTEMA DE DEMOSTRACIÓN - las asignaciones mostradas no son definitivas",
+    home:"\u2190 Inicio",
+    demo:"SISTEMA DE DEMOSTRACIÓN - los resultados mostrados no son definitivos",
     title:"Reembolso de Bomba de Calor de la Ciudad de Lincoln",
-    subtitle:"Consulte el nivel de reembolso de su hogar",
+    subtitle:"Ingrese su dirección para ver los montos de incentivo elegibles",
     addr_label:"Ingrese su dirección",
-    addr_hint:"Empiece a escribir y seleccione su dirección de la lista.",
+    addr_hint:"Empiece a escribir y elija su dirección de la lista (flechas o clic).",
     nomatch_text:"No encontramos esta dirección en la lista de servicio elegible del programa. Si cree que su dirección debería estar incluida, contacte a",
     email_label:"Correo electrónico",
     btn_send:"Enviar código de verificación",
     code_label:"Ingrese el código de 6 dígitos enviado a su correo",
     btn_verify:"Verificar",
-    result_intro:"El nivel de reembolso de su hogar:",
+    result_intro:"Los montos de incentivo elegibles de su hogar:",
+    row_les:"Incentivo de LES (disponible para todos los clientes de LES que instalen bombas de calor de alta eficiencia)",
+    row_ac:"Incentivo de la Ciudad de Lincoln - bomba de calor que reemplaza un aire acondicionado central",
+    row_hp:"Incentivo de la Ciudad de Lincoln - bomba de calor que reemplaza una bomba de calor existente",
+    lmi_note:"Puede calificar en su lugar para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados si su ingreso es equivalente o inferior al 80% del ingreso medio del área de Lincoln. Las aprobaciones deben ocurrir antes de la instalación, y las unidades de alquiler no son elegibles para el incentivo LMI.",
+    lmi_link:"Cómo verificar la elegibilidad LMI",
+    link_les:"Programa de Energía Sostenible de LES",
+    link_city:"Incentivos de Bomba de Calor de la Ciudad de Lincoln",
+    elig_summary:"Detalles de elegibilidad del programa",
+    elig_who_h:"Quién es elegible:",
+    elig_who_intro:"Residentes de la Ciudad de Lincoln que:",
+    elig_who_1:"Viven en, o son propietarios y alquilan, una casa unifamiliar independiente (las unidades de alquiler no son elegibles para el incentivo LMI)",
+    elig_who_2:"Viven en y son propietarios de una casa adosada, town home, condominio o dúplex",
+    elig_what_h:"Qué es elegible:",
+    elig_what_1:"La compra e instalación de bombas de calor de fuente de aire o mini-split",
+    elig_what_2:"Las bombas de calor deben reemplazar una bomba de calor o un aire acondicionado central existente de al menos cinco años. Los aires acondicionados de ventana también son elegibles para reemplazo cuando la propiedad no tiene aire acondicionado central. Una bomba de calor puede combinarse con un horno de gas o eléctrico.",
+    elig_what_3:"La bomba de calor debe ser de tipo inverter o tener un SEER2 mínimo de 15.2 (Índice de Eficiencia Energética Estacional) y un EER2 mínimo de 12 (Índice de Eficiencia Energética)",
+    elig_not_h:"Qué no es elegible:",
+    elig_not_1:"Cualquier residencia fuera de los límites de la ciudad de Lincoln",
+    elig_not_2:"Propiedad comercial, incluida la vivienda multifamiliar",
+    elig_not_3:"Casas adosadas, town homes, condominios y dúplex si la unidad está ocupada por inquilinos",
+    elig_not_4:"Bombas de calor geotérmicas",
+    elig_not_5:"Construcción residencial nueva",
+    elig_not_6:"Casas móviles",
+    elig_not_7:"Más de una bomba de calor por hogar por año del programa de la Ciudad (1 sept - 31 ago)",
+    elig_not_8:"Instalación de una bomba de calor nueva sin reemplazo de un sistema antiguo",
+    elig_more:"Detalles completos del programa - Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     warn_mf:"Esta dirección es parte de una propiedad multifamiliar. Las reglas de elegibilidad pueden diferir - confirme con el programa antes de continuar.",
     warn_new:"Esta propiedad fue registrada recientemente y puede ser construcción nueva, la cual no es elegible para incentivos de la Ciudad de Lincoln. El programa verificará la elegibilidad.",
     result_note:"Se ha registrado este resultado. Comparta esta pantalla o su correo de confirmación con su contratista.",
     toggle:"English",
     err_email:"Por favor ingrese un correo electrónico válido.",
     err_code:"Ingrese el código de 6 dígitos.",
+    loading:"Verificando...",
   },
 };
 const params = new URLSearchParams(location.search);
@@ -242,11 +407,10 @@ function applyLang() {
   document.documentElement.lang = lang;
   for (const el of document.querySelectorAll("[data-i18n]"))
     el.textContent = STRINGS[lang][el.dataset.i18n];
-  document.getElementById("lang-toggle").textContent = STRINGS[lang].toggle;
+  $("lang-toggle").textContent = STRINGS[lang].toggle;
+  $("home-link").setAttribute("href", lang === "es" ? "index.html?lang=es" : "index.html");
 }
-document.getElementById("lang-toggle").onclick = () => {
-  lang = lang === "en" ? "es" : "en"; applyLang();
-};
+$("lang-toggle").onclick = () => { lang = lang === "en" ? "es" : "en"; applyLang(); };
 applyLang();
 </script>
 </body>

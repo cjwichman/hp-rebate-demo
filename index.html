@@ -5,40 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heat Pump Rebate Portal - Lincoln, NE</title>
 <style>
-  :root { --blue:#1a5276; --bg:#f7f9fa; --border:#d5dbdb; }
-  * { box-sizing:border-box; }
-  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
-         max-width:560px; margin:0 auto; padding:16px; color:#212f3c; }
-  .demo-banner { background:#f9e79f; border:1px solid #d4ac0d; padding:8px 12px;
-         border-radius:6px; font-size:13px; text-align:center; margin-bottom:16px; }
-  .lang { text-align:right; font-size:14px; margin-bottom:4px; }
-  .lang a { color:var(--blue); cursor:pointer; text-decoration:underline; }
-  h1 { font-size:24px; color:var(--blue); margin:8px 0 4px; }
-  .sub { color:#5d6d7e; font-size:15px; margin-bottom:24px; }
+  :root { --blue:#155e75; --bg:#f4f6f8; --border:#e2e8f0; --muted:#64748b; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+         background:var(--bg); max-width:520px; margin:0 auto; padding:20px 16px 48px;
+         color:#1e293b; line-height:1.5; }
+  .demo-banner { background:#fef9c3; border:1px solid #eab308; color:#713f12;
+         padding:8px 14px; border-radius:8px; font-size:13px; text-align:center;
+         margin-bottom:14px; }
+  .lang { text-align:right; font-size:14px; margin-bottom:8px; }
+  .lang a { color:var(--blue); cursor:pointer; text-decoration:none; }
+  .lang a:hover { text-decoration:underline; }
+  h1 { font-size:24px; font-weight:700; color:var(--blue); letter-spacing:-0.01em; }
+  .sub { color:var(--muted); font-size:15px; margin:4px 0 22px; }
   .choice { display:block; background:#fff; border:1px solid var(--border);
-            border-radius:8px; padding:22px; margin-bottom:16px; text-decoration:none;
-            color:inherit; }
-  .choice:hover { border-color:var(--blue); }
-  .choice h2 { margin:0 0 6px; font-size:18px; color:var(--blue); }
-  .choice p { margin:0; font-size:14px; color:#5d6d7e; }
+            border-radius:12px; padding:22px; margin-bottom:14px; text-decoration:none;
+            color:inherit; box-shadow:0 1px 3px rgba(15,23,42,.06);
+            transition:border-color .15s, box-shadow .15s; }
+  .choice:hover { border-color:var(--blue); box-shadow:0 2px 8px rgba(15,23,42,.10); }
+  .choice h2 { margin:0 0 6px; font-size:17px; color:var(--blue); }
+  .choice p { margin:0; font-size:14px; color:var(--muted); }
 </style>
 </head>
 <body>
 
-<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - tier assignments shown are not final</div>
-<div class="lang"><a id="lang-toggle">Español</a></div>
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - results shown are not final</div>
+<div class="lang"><a id="lang-toggle">Español (beta)</a></div>
 
 <h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
 <p class="sub" data-i18n="subtitle">Choose how you'd like to use this portal</p>
 
-<a class="choice" href="household.html">
-  <h2 data-i18n="hh_title">I'm a homeowner or resident</h2>
-  <p data-i18n="hh_desc">Check your household's rebate tier by verifying your address and email.</p>
-</a>
-
 <a class="choice" href="contractor.html">
   <h2 data-i18n="co_title">I'm a contractor</h2>
-  <p data-i18n="co_desc">Log in to verify a customer's rebate tier before installation.</p>
+  <p data-i18n="co_desc">Log in to look up a customer's eligible incentive amounts before installation.</p>
+</a>
+
+<a class="choice" href="household.html">
+  <h2 data-i18n="hh_title">I'm a homeowner or resident</h2>
+  <p data-i18n="hh_desc">Look up your household's eligible incentive amounts by verifying your address and email.</p>
 </a>
 
 <script>
@@ -46,23 +50,23 @@
 // should be reviewed by a native speaker before production launch.
 const STRINGS = {
   en: {
-    demo: "DEMO SYSTEM - tier assignments shown are not final",
+    demo: "DEMO SYSTEM - results shown are not final",
     title: "City of Lincoln Heat Pump Rebate",
     subtitle: "Choose how you'd like to use this portal",
     hh_title: "I'm a homeowner or resident",
-    hh_desc: "Check your household's rebate tier by verifying your address and email.",
+    hh_desc: "Look up your household's eligible incentive amounts by verifying your address and email.",
     co_title: "I'm a contractor",
-    co_desc: "Log in to verify a customer's rebate tier before installation.",
-    toggle: "Español",
+    co_desc: "Log in to look up a customer's eligible incentive amounts before installation.",
+    toggle: "Español (beta)",
   },
   es: {
-    demo: "SISTEMA DE DEMOSTRACIÓN - las asignaciones mostradas no son definitivas",
+    demo: "SISTEMA DE DEMOSTRACIÓN - los resultados mostrados no son definitivos",
     title: "Reembolso de Bomba de Calor de la Ciudad de Lincoln",
     subtitle: "Elija cómo desea usar este portal",
     hh_title: "Soy propietario o residente",
-    hh_desc: "Consulte el nivel de reembolso de su hogar verificando su dirección y correo electrónico.",
+    hh_desc: "Consulte los montos de incentivo elegibles de su hogar verificando su dirección y correo electrónico.",
     co_title: "Soy contratista",
-    co_desc: "Inicie sesión para verificar el nivel de reembolso de un cliente antes de la instalación.",
+    co_desc: "Inicie sesión para consultar los montos de incentivo elegibles de un cliente antes de la instalación.",
     toggle: "English",
   },
 };
