@@ -51,6 +51,9 @@
   table.amounts td { padding:8px 4px; border-bottom:1px solid #dbeafe; font-size:13px; }
   table.amounts td.amt { text-align:right; font-weight:700; color:var(--green);
                          white-space:nowrap; font-size:15px; }
+  table.amounts tr.total td { border-top:2px solid #93c5fd; border-bottom:none;
+                              font-weight:700; color:var(--text); }
+  table.amounts tr.total td.amt { font-size:16px; }
   .lmi { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; border-radius:8px;
          padding:9px 12px; font-size:12px; margin-top:10px; }
   .links { font-size:12px; margin-top:10px; }
@@ -128,8 +131,12 @@
           <td class="amt" id="amt-ac"></td></tr>
       <tr><td data-i18n="row_hp">City incentive - replacing existing heat pump</td>
           <td class="amt" id="amt-hp"></td></tr>
+      <tr class="total"><td data-i18n="tot_ac">Total (LES + City) - replacing central AC</td>
+          <td class="amt" id="tot-ac"></td></tr>
+      <tr class="total"><td data-i18n="tot_hp">Total (LES + City) - replacing existing heat pump</td>
+          <td class="amt" id="tot-hp"></td></tr>
     </table>
-    <div class="lmi"><span data-i18n="lmi_note">Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive (income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible).</span>
+    <div class="lmi"><span data-i18n="lmi_note">Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.</span>
       <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_link">How to verify LMI eligibility</a></div>
     <p class="links">
       <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
@@ -180,6 +187,10 @@ const $ = (id) => document.getElementById(id);
 
 // The password is validated server-side on every lookup; the login
 // screen only stores it locally for subsequent requests.
+$("pw").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") $("btn-login").click();
+});
+
 $("btn-login").addEventListener("click", () => {
   password = $("pw").value;
   if (!password) { $("err-login").textContent = STRINGS[lang].err_pw; return; }
@@ -203,6 +214,8 @@ function renderSuggestions() {
 
 function choose(i) {
   const row = sugRows[i];
+  clearTimeout(logTimer);
+  logSearch($("q").value.trim(), true);
   logEvent("select", { rank: i + 1, qlen: $("q").value.trim().length, lang });
   $("q").value = row.display_address;
   $("suggestions").style.display = "none";
@@ -229,8 +242,23 @@ $("q").addEventListener("input", () => {
     sugRows = r.ok ? await r.json() : [];
     activeIdx = -1;
     renderSuggestions();
+    clearTimeout(logTimer);
+    const settledQ = q, matched = sugRows.length > 0;
+    logTimer = setTimeout(() => { logSearch(settledQ, matched); }, 1200);
   }, 250);
 });
+
+let logTimer = null;
+function logSearch(q, matched) {
+  fetch(LOG, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ etype: matched ? "search" : "search_no_match",
+                           sid: SESSION_ID, qtext: q.toUpperCase(),
+                           meta_in: { page: "contractor", device: DEVICE, lang } }),
+  }).catch(() => {});
+}
 
 $("q").addEventListener("keydown", (ev) => {
   if (!sugRows.length) return;
@@ -270,14 +298,18 @@ async function doLookup(row) {
     return;
   }
   const d = await r.json();
+  const LES = 1000;
   const CITY_AMOUNTS = {
-    Standard: { ac: "$750",   hp: "$0"   },
-    Enhanced: { ac: "$1,500", hp: "$500" },
+    Standard: { ac: 750,  hp: 0   },
+    Enhanced: { ac: 1500, hp: 500 },
   };
-  const amt = CITY_AMOUNTS[d.tier] || { ac: "-", hp: "-" };
+  const fmt = (n) => "$" + n.toLocaleString("en-US");
+  const amt = CITY_AMOUNTS[d.tier] || { ac: 0, hp: 0 };
   $("res-addr").textContent = d.display_address;
-  $("amt-ac").textContent = amt.ac;
-  $("amt-hp").textContent = amt.hp;
+  $("amt-ac").textContent = fmt(amt.ac);
+  $("amt-hp").textContent = fmt(amt.hp);
+  $("tot-ac").textContent = fmt(LES + amt.ac);
+  $("tot-hp").textContent = fmt(LES + amt.hp);
   $("warn-mf").classList.toggle("hidden", !d.flag_multifamily);
   $("warn-new").classList.toggle("hidden", !d.flag_new_construction);
   $("resbox").style.display = "block";
@@ -296,7 +328,9 @@ const STRINGS = {
     row_les:"LES incentive (all LES customers, high-efficiency heat pumps)",
     row_ac:"City incentive - replacing central air conditioner",
     row_hp:"City incentive - replacing existing heat pump",
-    lmi_note:"Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive (income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible).",
+    lmi_note:"Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.",
+    tot_ac:"Total (LES + City) - replacing central AC",
+    tot_hp:"Total (LES + City) - replacing existing heat pump",
     lmi_link:"How to verify LMI eligibility",
     elig_summary:"Program eligibility details",
     elig_who_h:"Who is eligible:",
@@ -339,7 +373,9 @@ const STRINGS = {
     row_les:"Incentivo de LES (todos los clientes de LES, bombas de calor de alta eficiencia)",
     row_ac:"Incentivo de la Ciudad - reemplazo de aire acondicionado central",
     row_hp:"Incentivo de la Ciudad - reemplazo de bomba de calor existente",
-    lmi_note:"Los clientes que califiquen por ingresos pueden ser elegibles para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados (ingreso igual o inferior al 80% del ingreso medio del área de Lincoln; se requiere aprobación antes de la instalación; unidades de alquiler no elegibles).",
+    lmi_note:"Los clientes que califiquen por ingresos pueden ser elegibles para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados, el cual reemplaza los montos de la Ciudad indicados arriba. El incentivo de $1,000 de LES aún aplica adicionalmente (total $4,000). Ingreso igual o inferior al 80% del ingreso medio del área de Lincoln; se requiere aprobación antes de la instalación; unidades de alquiler no elegibles.",
+    tot_ac:"Total (LES + Ciudad) - reemplazo de aire acondicionado central",
+    tot_hp:"Total (LES + Ciudad) - reemplazo de bomba de calor existente",
     lmi_link:"Cómo verificar la elegibilidad LMI",
     elig_summary:"Detalles de elegibilidad del programa",
     elig_who_h:"Quién es elegible:",

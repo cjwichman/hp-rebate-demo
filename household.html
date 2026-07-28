@@ -58,6 +58,9 @@
   table.amounts td { padding:9px 4px; border-bottom:1px solid #f1f5f9; font-size:14px; }
   table.amounts td.amt { text-align:right; font-weight:700; color:var(--green);
                          white-space:nowrap; font-size:16px; }
+  table.amounts tr.total td { border-top:2px solid var(--border); border-bottom:none;
+                              font-weight:700; color:var(--text); }
+  table.amounts tr.total td.amt { font-size:18px; }
   .lmi { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; border-radius:8px;
          padding:10px 14px; font-size:13px; margin-top:12px; text-align:left; }
   .links { font-size:13px; margin-top:12px; }
@@ -161,8 +164,12 @@
         <td class="amt" id="amt-ac"></td></tr>
     <tr><td data-i18n="row_hp">City of Lincoln incentive - heat pump replacing an existing heat pump</td>
         <td class="amt" id="amt-hp"></td></tr>
+    <tr class="total"><td data-i18n="tot_ac">Total (LES + City) - replacing a central air conditioner</td>
+        <td class="amt" id="tot-ac"></td></tr>
+    <tr class="total"><td data-i18n="tot_hp">Total (LES + City) - replacing an existing heat pump</td>
+        <td class="amt" id="tot-hp"></td></tr>
   </table>
-  <div class="lmi"><span data-i18n="lmi_note">You may instead qualify for the $3,000 low- and moderate-income City incentive if your income is equivalent to or below 80% of the Lincoln Area Median Income. Approvals must occur before the heat pump is installed, and rental units are not eligible for the LMI incentive.</span>
+  <div class="lmi"><span data-i18n="lmi_note">You may instead qualify for the $3,000 low- and moderate-income City incentive if your income is equivalent to or below 80% of the Lincoln Area Median Income. The LMI incentive replaces the City amounts above; the $1,000 LES incentive still applies in addition, for a total of $4,000. Approvals must occur before the heat pump is installed, and rental units are not eligible.</span>
     <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_link">How to verify LMI eligibility</a></div>
   <p class="links">
     <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
@@ -224,6 +231,8 @@ function renderSuggestions() {
 
 function choose(i) {
   selected = sugRows[i];
+  clearTimeout(logTimer);
+  logSearch($("q").value.trim(), true);
   logEvent("select", { rank: i + 1, qlen: $("q").value.trim().length, lang });
   $("q").value = selected.display_address;
   $("suggestions").style.display = "none";
@@ -251,8 +260,27 @@ $("q").addEventListener("input", () => {
     activeIdx = -1;
     renderSuggestions();
     if (!sugRows.length) $("nomatch").style.display = "block";
+    // Log only the settled query: wait for typing to stop so the log
+    // holds one row per search rather than one per keystroke.
+    clearTimeout(logTimer);
+    const settledQ = q, matched = sugRows.length > 0;
+    logTimer = setTimeout(() => {
+      logSearch(settledQ, matched);
+    }, 1200);
   }, 250);
 });
+
+let logTimer = null;
+function logSearch(q, matched) {
+  fetch(LOG, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ etype: matched ? "search" : "search_no_match",
+                           sid: SESSION_ID, qtext: q.toUpperCase(),
+                           meta_in: { page: "household", device: DEVICE, lang } }),
+  }).catch(() => {});
+}
 
 // Keyboard navigation: arrows to move, Enter to choose, Escape to close
 $("q").addEventListener("keydown", (ev) => {
@@ -268,6 +296,13 @@ $("q").addEventListener("keydown", (ev) => {
   } else if (ev.key === "Escape") {
     sugRows = []; renderSuggestions();
   }
+});
+
+$("email").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") $("btn-send").click();
+});
+$("code").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") $("btn-verify").click();
 });
 
 $("btn-send").addEventListener("click", async () => {
@@ -316,14 +351,20 @@ $("btn-verify").addEventListener("click", async () => {
     $("err-code").textContent = e.error || "Verification failed."; return;
   }
   const d = await r.json();
-  // City incentive amounts by assignment and replacement type
+  // City incentive amounts by assignment and replacement type.
+  // The two City rows are alternative scenarios, so each total is
+  // LES + the City amount for that scenario.
+  const LES = 1000;
   const CITY_AMOUNTS = {
-    Standard: { ac: "$750",   hp: "$0"   },
-    Enhanced: { ac: "$1,500", hp: "$500" },
+    Standard: { ac: 750,  hp: 0   },
+    Enhanced: { ac: 1500, hp: 500 },
   };
-  const amt = CITY_AMOUNTS[d.tier] || { ac: "-", hp: "-" };
-  $("amt-ac").textContent = amt.ac;
-  $("amt-hp").textContent = amt.hp;
+  const fmt = (n) => "$" + n.toLocaleString("en-US");
+  const amt = CITY_AMOUNTS[d.tier] || { ac: 0, hp: 0 };
+  $("amt-ac").textContent = fmt(amt.ac);
+  $("amt-hp").textContent = fmt(amt.hp);
+  $("tot-ac").textContent = fmt(LES + amt.ac);
+  $("tot-hp").textContent = fmt(LES + amt.hp);
   $("result-addr").textContent = d.display_address;
   if (d.flag_multifamily) show("warn-mf");
   if (d.flag_new_construction) show("warn-new");
@@ -351,7 +392,9 @@ const STRINGS = {
     row_les:"LES incentive (available to all LES customers installing high-efficiency heat pumps)",
     row_ac:"City of Lincoln incentive - heat pump replacing a central air conditioner",
     row_hp:"City of Lincoln incentive - heat pump replacing an existing heat pump",
-    lmi_note:"You may instead qualify for the $3,000 low- and moderate-income City incentive if your income is equivalent to or below 80% of the Lincoln Area Median Income. Approvals must occur before the heat pump is installed, and rental units are not eligible for the LMI incentive.",
+    lmi_note:"You may instead qualify for the $3,000 low- and moderate-income City incentive if your income is equivalent to or below 80% of the Lincoln Area Median Income. The LMI incentive replaces the City amounts above; the $1,000 LES incentive still applies in addition, for a total of $4,000. Approvals must occur before the heat pump is installed, and rental units are not eligible.",
+    tot_ac:"Total (LES + City) - replacing a central air conditioner",
+    tot_hp:"Total (LES + City) - replacing an existing heat pump",
     lmi_link:"How to verify LMI eligibility",
     link_les:"LES Sustainable Energy Program",
     link_city:"City of Lincoln Heat Pump Incentives",
@@ -400,7 +443,9 @@ const STRINGS = {
     row_les:"Incentivo de LES (disponible para todos los clientes de LES que instalen bombas de calor de alta eficiencia)",
     row_ac:"Incentivo de la Ciudad de Lincoln - bomba de calor que reemplaza un aire acondicionado central",
     row_hp:"Incentivo de la Ciudad de Lincoln - bomba de calor que reemplaza una bomba de calor existente",
-    lmi_note:"Puede calificar en su lugar para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados si su ingreso es equivalente o inferior al 80% del ingreso medio del área de Lincoln. Las aprobaciones deben ocurrir antes de la instalación, y las unidades de alquiler no son elegibles para el incentivo LMI.",
+    lmi_note:"Puede calificar en su lugar para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados si su ingreso es equivalente o inferior al 80% del ingreso medio del área de Lincoln. El incentivo LMI reemplaza los montos de la Ciudad indicados arriba; el incentivo de $1,000 de LES aún aplica adicionalmente, para un total de $4,000. Las aprobaciones deben ocurrir antes de la instalación, y las unidades de alquiler no son elegibles.",
+    tot_ac:"Total (LES + Ciudad) - reemplazo de aire acondicionado central",
+    tot_hp:"Total (LES + Ciudad) - reemplazo de bomba de calor existente",
     lmi_link:"Cómo verificar la elegibilidad LMI",
     link_les:"Programa de Energía Sostenible de LES",
     link_city:"Incentivos de Bomba de Calor de la Ciudad de Lincoln",

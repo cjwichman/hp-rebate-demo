@@ -34,7 +34,7 @@
 </head>
 <body>
 
-<h1>Research Dashboard <span class="muted" style="font-weight:normal">(last 14 days - refresh page to update)</span></h1>
+<h1>Research Dashboard <span class="muted" style="font-weight:normal">(full history - refresh page to update)</span></h1>
 
 <div class="card" id="login">
   <label for="pw">Dashboard password</label>
@@ -62,6 +62,7 @@
       <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard rebate viewed</div></div>
       <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced rebate viewed</div></div>
       <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor rebate lookups</div></div>
+      <div class="stat"><div class="n" id="s-multi">-</div><div class="l">Emails viewing 2+ addresses</div></div>
       <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed verification codes</div></div>
     </div>
   </div>
@@ -110,6 +111,7 @@ $("btn-login").addEventListener("click", async () => {
   $("s-standard").textContent = d.reveals_standard;
   $("s-enhanced").textContent = d.reveals_enhanced;
   $("s-contractor").textContent = d.contractor_lookups;
+  $("s-multi").textContent = d.multi_address_emails ?? "-";
   $("s-codefail").textContent = d.codes_failed;
 
   // Daily reveal bars (simple horizontal bars, no chart library needed)
