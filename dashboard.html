@@ -47,6 +47,8 @@
   <div class="card">
     <h2>Household portal activity (search &rarr; verify &rarr; view)</h2>
     <div class="grid">
+      <div class="stat"><div class="n" id="s-sessions">-</div><div class="l">Unique visits (sessions)</div></div>
+      <div class="stat"><div class="n" id="s-selections">-</div><div class="l">Addresses selected</div></div>
       <div class="stat"><div class="n" id="s-searches">-</div><div class="l">Address searches run</div></div>
       <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">Searches with no eligible match</div></div>
       <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Verification codes requested</div></div>
@@ -99,6 +101,8 @@ $("btn-login").addEventListener("click", async () => {
   $("login").classList.add("hidden");
   $("dash").classList.remove("hidden");
 
+  $("s-sessions").textContent = d.unique_sessions ?? "-";
+  $("s-selections").textContent = d.selections ?? "-";
   $("s-searches").textContent = d.searches;
   $("s-nomatch").textContent = d.searches_no_match;
   $("s-codes").textContent = d.codes_sent;

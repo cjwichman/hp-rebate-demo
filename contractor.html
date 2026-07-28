@@ -111,7 +111,6 @@
   <input id="pw" type="password">
   <button id="btn-login" data-i18n="btn_login">Log in</button>
   <div class="error" id="err-login"></div>
-  <p class="muted" data-i18n="access_note">Contact the research team if you need access.</p>
 </div>
 
 <!-- Lookup -->
@@ -139,7 +138,12 @@
     <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">Multi-family property - eligibility rules may differ. Confirm with the program.</div>
     <div class="warn hidden" id="warn-new" data-i18n="warn_new">Recently created premise - may be new construction, which is not eligible for City incentives.</div>
   </div>
-  <p class="muted" data-i18n="lookup_note">Select an address from the suggestions to view the customer's eligible rebate.</p>
+  <p class="muted" id="lookup-note" data-i18n="lookup_note">Select an address from the suggestions to view the customer's eligible incentive amounts.</p>
+  <details id="noaddr-details">
+    <summary data-i18n="noaddr_summary">Address not appearing?</summary>
+    <p style="margin-top:8px"><span data-i18n="noaddr_text">The search covers residential addresses within Lincoln city limits on the program's eligible-service list. If a customer's address does not appear, it may be outside city limits or missing from the list. For assistance, email</span>
+    <a href="mailto:SEP@les.com">SEP@les.com</a>.</p>
+  </details>
 </div>
 
 <script>
@@ -150,6 +154,24 @@ const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
 
 const API = `${SUPABASE_URL}/functions/v1/portal-api`;
 const RPC = `${SUPABASE_URL}/rest/v1/rpc/search_premises`;
+const LOG = `${SUPABASE_URL}/rest/v1/rpc/log_event`;
+
+// Session id groups this visit's events for funnel analysis. No cookies,
+// no cross-visit tracking: a new id is generated on every page load.
+const SESSION_ID = crypto.randomUUID();
+const DEVICE = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+  ? "mobile" : "desktop";
+
+function logEvent(etype, meta) {
+  fetch(LOG, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ etype, sid: SESSION_ID,
+                           meta_in: { page: "contractor", device: DEVICE, ...meta } }),
+  }).catch(() => {});
+}
+
 let password = null;
 let debounce = null;
 let sugRows = [];
@@ -181,6 +203,7 @@ function renderSuggestions() {
 
 function choose(i) {
   const row = sugRows[i];
+  logEvent("select", { rank: i + 1, qlen: $("q").value.trim().length, lang });
   $("q").value = row.display_address;
   $("suggestions").style.display = "none";
   sugRows = []; activeIdx = -1;
@@ -190,6 +213,9 @@ function choose(i) {
 $("q").addEventListener("input", () => {
   clearTimeout(debounce);
   $("resbox").style.display = "none";
+  // Restore the how-to hints when a new lookup begins
+  $("lookup-note").style.display = "";
+  $("noaddr-details").style.display = "";
   const q = $("q").value.trim();
   if (q.length < 3) { sugRows = []; renderSuggestions(); return; }
   debounce = setTimeout(async () => {
@@ -197,7 +223,8 @@ $("q").addEventListener("input", () => {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
                  Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-      body: JSON.stringify({ q }),
+      body: JSON.stringify({ q, sid: SESSION_ID,
+                             meta_in: { page: "contractor", device: DEVICE, lang } }),
     });
     sugRows = r.ok ? await r.json() : [];
     activeIdx = -1;
@@ -227,7 +254,8 @@ async function doLookup(row) {
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
                Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
     body: JSON.stringify({ action: "contractor_lookup",
-                           public_id: row.public_id, password }),
+                           public_id: row.public_id, password,
+                           session_id: SESSION_ID }),
   });
   if (r.status === 401) {
     // Wrong password: return to login
@@ -253,6 +281,9 @@ async function doLookup(row) {
   $("warn-mf").classList.toggle("hidden", !d.flag_multifamily);
   $("warn-new").classList.toggle("hidden", !d.flag_new_construction);
   $("resbox").style.display = "block";
+  // Hide the how-to hints once a result is on screen
+  $("lookup-note").style.display = "none";
+  $("noaddr-details").style.display = "none";
 }
 
 // --- Language support (EN/ES beta). Spanish requires native review pre-launch.
@@ -290,11 +321,12 @@ const STRINGS = {
     link_city:"City Heat Pump Incentives",
     pw_label:"Contractor password",
     btn_login:"Log in",
-    access_note:"Contact the research team if you need access.",
     addr_label:"Customer address",
     warn_mf:"Multi-family property - eligibility rules may differ. Confirm with the program.",
     warn_new:"Recently created premise - may be new construction, which is not eligible for City incentives.",
     lookup_note:"Select an address from the suggestions to view the customer's eligible incentive amounts.",
+    noaddr_summary:"Address not appearing?",
+    noaddr_text:"The search covers residential addresses within Lincoln city limits on the program's eligible-service list. If a customer's address does not appear, it may be outside city limits or missing from the list. For assistance, email",
     toggle:"Español (beta)",
     err_pw:"Enter the password.",
     err_pw_bad:"Invalid password.",
@@ -332,11 +364,12 @@ const STRINGS = {
     link_city:"Incentivos de Bomba de Calor de la Ciudad",
     pw_label:"Contraseña de contratista",
     btn_login:"Iniciar sesión",
-    access_note:"Contacte al equipo de investigación si necesita acceso.",
     addr_label:"Dirección del cliente",
     warn_mf:"Propiedad multifamiliar - las reglas de elegibilidad pueden diferir. Confirme con el programa.",
     warn_new:"Propiedad registrada recientemente - puede ser construcción nueva, no elegible para incentivos de la Ciudad.",
     lookup_note:"Seleccione una dirección de las sugerencias para ver los montos de incentivo elegibles del cliente.",
+    noaddr_summary:"¿No aparece la dirección?",
+    noaddr_text:"La búsqueda cubre direcciones residenciales dentro de los límites de la ciudad de Lincoln en la lista de servicio elegible del programa. Si la dirección de un cliente no aparece, puede estar fuera de los límites de la ciudad o faltar en la lista. Para asistencia, escriba a",
     toggle:"English",
     err_pw:"Ingrese la contraseña.",
     err_pw_bad:"Contraseña inválida.",
@@ -353,6 +386,7 @@ function applyLang() {
 }
 $("lang-toggle").onclick = () => { lang = lang === "en" ? "es" : "en"; applyLang(); };
 applyLang();
+logEvent("page_view", { lang });
 </script>
 </body>
 </html>
