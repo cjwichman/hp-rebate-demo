@@ -393,11 +393,14 @@ $("btn-forgot").addEventListener("click", async () => {
   const email = $("fp-email").value.trim();
   if (!email) { $("err-forgot").textContent = "Enter your email."; return; }
   // The response does not reveal whether the account exists, so the
-  // confirmation message is the same either way.
-  await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+  // confirmation message is the same either way. redirect_to must be
+  // a URL query parameter on this endpoint, not a body field - GoTrue's
+  // REST API differs from the JS SDK's client-side option shape here.
+  const redirectTo = encodeURIComponent(`${location.origin}/reset.html`);
+  await fetch(`${SUPABASE_URL}/auth/v1/recover?redirect_to=${redirectTo}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
-    body: JSON.stringify({ email, options: { redirect_to: `${location.origin}/reset.html` } }),
+    body: JSON.stringify({ email }),
   }).catch(() => {});
   $("ok-forgot").classList.remove("hidden");
 });

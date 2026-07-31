@@ -258,10 +258,13 @@ $("btn-forgot").addEventListener("click", async () => {
   $("err-forgot").textContent = ""; $("ok-forgot").classList.add("hidden");
   const email = $("fp-email").value.trim();
   if (!email) { $("err-forgot").textContent = "Enter your email."; return; }
-  await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+  // redirect_to must be a URL query parameter on this endpoint, not a
+  // body field - GoTrue's REST API differs from the JS SDK's option shape.
+  const redirectTo = encodeURIComponent(`${location.origin}/reset.html?from=dashboard`);
+  await fetch(`${SUPABASE_URL}/auth/v1/recover?redirect_to=${redirectTo}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
-    body: JSON.stringify({ email, options: { redirect_to: `${location.origin}/reset.html?from=dashboard` } }),
+    body: JSON.stringify({ email }),
   }).catch(() => {});
   $("ok-forgot").classList.remove("hidden");
 });
