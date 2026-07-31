@@ -39,6 +39,8 @@
   button:hover { background:var(--navy-deep); }
   button:focus-visible { outline:none; box-shadow:0 0 0 3px var(--ring); }
   .error { color:var(--alert); font-size:14px; margin-top:10px; }
+  .ok { color:var(--ok); font-size:14px; margin-top:10px; }
+  .cp-h { font-family:var(--slab); font-size:18px; color:var(--navy); margin-bottom:16px; }
   .hidden { display:none; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
   .stat { background:var(--navy-tint); border-radius:10px; padding:14px; text-align:center; }
@@ -58,20 +60,73 @@
   .legend { font-size:12px; color:var(--muted); margin-bottom:6px; }
   .legend .sw { display:inline-block; width:10px; height:10px; border-radius:2px;
                 margin:0 4px 0 10px; }
+  .field { margin-bottom:14px; }
+  .field .svy-note { margin:6px 0 0; }
+  .svy-note { font-size:13px; color:var(--muted); }
+  .switch { font-size:14px; margin-top:14px; text-align:center; }
+  .switch a { color:var(--navy); cursor:pointer; }
 </style>
 </head>
 <body>
 
-<h1>Research Dashboard <span class="muted" style="font-weight:normal">(full history - refresh page to update)</span></h1>
+<h1>Research Dashboard</h1>
 
 <div class="card" id="login">
-  <label for="pw">Dashboard password</label>
-  <input id="pw" type="password">
-  <button id="btn-login">View dashboard</button>
+  <div class="field"><label for="li-email">Email</label>
+  <input id="li-email" type="email" autocomplete="username"></div>
+  <div class="field"><label for="li-pw">Password</label>
+  <input id="li-pw" type="password" autocomplete="current-password"></div>
+  <button id="btn-login">Log in</button>
   <div class="error" id="err"></div>
+  <p class="switch">No account? <a id="to-signup">Create one</a></p>
+  <p class="switch"><a id="to-forgot">Forgot password?</a></p>
+</div>
+
+<!-- Forgot password -->
+<div class="card hidden" id="forgot">
+  <div class="field"><label for="fp-email">Email</label>
+  <input id="fp-email" type="email" autocomplete="username"></div>
+  <button id="btn-forgot">Send reset link</button>
+  <div class="error" id="err-forgot"></div>
+  <div class="ok hidden" id="ok-forgot">If that email has an account, a reset link is on its way.</div>
+  <p class="switch"><a id="forgot-to-login">Log in</a></p>
+</div>
+
+<!-- Signup: invite-gated, one account per collaborator -->
+<div class="card hidden" id="signup">
+  <div class="field"><label for="su-name">Name</label>
+  <input id="su-name" type="text" autocomplete="name"></div>
+  <div class="field"><label for="su-invite">Invite code</label>
+  <input id="su-invite" type="text" autocomplete="off">
+  <p class="svy-note">Provided by the research team to collaborators.</p></div>
+  <div class="field"><label for="su-email">Email</label>
+  <input id="su-email" type="email" autocomplete="username"></div>
+  <div class="field"><label for="su-pw">Password (8+ characters)</label>
+  <input id="su-pw" type="password" autocomplete="new-password"></div>
+  <button id="btn-signup">Create account</button>
+  <div class="error" id="err-signup"></div>
+  <p class="switch">Already have an account? <a id="to-login">Log in</a></p>
+</div>
+
+<!-- Change password (logged in) -->
+<div class="card hidden" id="changepw">
+  <h2 class="cp-h">Change your password</h2>
+  <div class="field"><label for="cp-old">Current password</label>
+  <input id="cp-old" type="password" autocomplete="current-password"></div>
+  <div class="field"><label for="cp-pw1">Enter your new password (8+ characters)</label>
+  <input id="cp-pw1" type="password" autocomplete="new-password"></div>
+  <div class="field"><label for="cp-pw2">Confirm new password</label>
+  <input id="cp-pw2" type="password" autocomplete="new-password"></div>
+  <button id="btn-changepw">Set new password</button>
+  <div class="error" id="err-changepw"></div>
+  <div class="ok hidden" id="ok-changepw">Password updated.</div>
+  <p class="switch"><a id="changepw-back">Back</a></p>
 </div>
 
 <div class="hidden" id="dash">
+  <p class="muted" style="margin:-8px 0 16px">Full history. Refresh the page to update.
+    <a id="to-changepw" style="color:var(--navy); cursor:pointer; margin-left:10px">Change password</a>
+    <a id="btn-logout" style="color:var(--navy); cursor:pointer; margin-left:10px">Log out</a></p>
   <div class="card">
     <h2>Household site activity (search &rarr; verify &rarr; view)</h2>
     <div class="grid">
@@ -174,21 +229,134 @@ const HIGH_VOLUME_ALERT = 100;
 // ------------------------------------------------------------------
 
 const API = `${SUPABASE_URL}/functions/v1/portal-api`;
+const AUTH = `${SUPABASE_URL}/auth/v1/token?grant_type=password`;
 const $ = (id) => document.getElementById(id);
 const pct = (num, den) => den ? Math.round((num / den) * 100) + "%" : "-";
 
-$("btn-login").addEventListener("click", async () => {
-  $("err").textContent = "";
+// Session kept in sessionStorage: survives a refresh, cleared when
+// the tab closes or on explicit logout. Mirrors the contractor page.
+let accessToken = null;
+try {
+  accessToken = sessionStorage.getItem("hp_dashboard_token") || null;
+} catch { /* private-mode storage failures are non-fatal */ }
+
+$("to-signup").addEventListener("click", () => {
+  $("login").classList.add("hidden"); $("signup").classList.remove("hidden");
+});
+$("to-login").addEventListener("click", () => {
+  $("signup").classList.add("hidden"); $("login").classList.remove("hidden");
+});
+
+// ---- Forgot password ----
+$("to-forgot").addEventListener("click", () => {
+  $("login").classList.add("hidden"); $("forgot").classList.remove("hidden");
+});
+$("forgot-to-login").addEventListener("click", () => {
+  $("forgot").classList.add("hidden"); $("login").classList.remove("hidden");
+});
+$("btn-forgot").addEventListener("click", async () => {
+  $("err-forgot").textContent = ""; $("ok-forgot").classList.add("hidden");
+  const email = $("fp-email").value.trim();
+  if (!email) { $("err-forgot").textContent = "Enter your email."; return; }
+  await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email, options: { redirect_to: `${location.origin}/reset.html?from=dashboard` } }),
+  }).catch(() => {});
+  $("ok-forgot").classList.remove("hidden");
+});
+
+// ---- Change password (while logged in) ----
+$("to-changepw").addEventListener("click", () => {
+  $("dash").classList.add("hidden"); $("changepw").classList.remove("hidden");
+  $("cp-pw1").value = ""; $("cp-pw2").value = "";
+  $("err-changepw").textContent = ""; $("ok-changepw").classList.add("hidden");
+});
+$("changepw-back").addEventListener("click", () => {
+  $("changepw").classList.add("hidden"); $("dash").classList.remove("hidden");
+});
+$("btn-changepw").addEventListener("click", async () => {
+  $("err-changepw").textContent = "";
+  const oldPw = $("cp-old").value;
+  const pw1 = $("cp-pw1").value, pw2 = $("cp-pw2").value;
+  if (!oldPw) { $("err-changepw").textContent = "Enter your current password."; return; }
+  if (pw1.length < 8) { $("err-changepw").textContent = "New password must be at least 8 characters."; return; }
+  if (pw1 !== pw2) { $("err-changepw").textContent = "New passwords do not match."; return; }
+
+  const who = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+  });
+  if (!who.ok) {
+    $("err-changepw").textContent = "Session expired. Log out and back in, then try again."; return;
+  }
+  const whoData = await who.json();
+  const check = await fetch(AUTH, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email: whoData.email, password: oldPw }),
+  });
+  if (!check.ok) {
+    $("err-changepw").textContent = "Current password is incorrect."; return;
+  }
+
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ password: pw1 }),
+  });
+  if (!r.ok) {
+    $("err-changepw").textContent = "Could not update password. Log out and back in, then try again.";
+    return;
+  }
+  $("ok-changepw").classList.remove("hidden");
+});
+
+$("btn-signup").addEventListener("click", async () => {
+  $("err-signup").textContent = "";
   const r = await fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
                Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-    body: JSON.stringify({ action: "dashboard_stats", password: $("pw").value }),
+    body: JSON.stringify({
+      action: "dashboard_signup",
+      name: $("su-name").value.trim(),
+      email: $("su-email").value.trim(),
+      password: $("su-pw").value,
+      invite_code: $("su-invite").value.trim(),
+    }),
   });
-  if (!r.ok) { $("err").textContent = "Invalid password or request failed."; return; }
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    $("err-signup").textContent = e.error || "Signup failed."; return;
+  }
+  // Auto-login after signup, same pattern as the contractor page
+  $("li-email").value = $("su-email").value;
+  $("li-pw").value = $("su-pw").value;
+  $("signup").classList.add("hidden"); $("login").classList.remove("hidden");
+  $("btn-login").click();
+});
+
+// Fetches stats with the given token and renders the dashboard.
+// Returns true on success; on failure, clears the stored token (an
+// expired/invalid session should not be silently retried) and
+// leaves the caller to show the login screen.
+async function loadStats(token) {
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "dashboard_stats", access_token: token }),
+  });
+  if (!r.ok) {
+    accessToken = null;
+    try { sessionStorage.removeItem("hp_dashboard_token"); } catch {}
+    return false;
+  }
   const d = await r.json();
 
   $("login").classList.add("hidden");
+  $("signup").classList.add("hidden");
   $("dash").classList.remove("hidden");
 
   $("s-sessions").textContent = d.unique_sessions ?? "-";
@@ -298,7 +466,38 @@ $("btn-login").addEventListener("click", async () => {
   tb.innerHTML = (d.recent_failed_queries || [])
     .map((f) => `<tr><td>${f.q ?? ""}</td><td>${(f.at ?? "").slice(0, 16).replace("T", " ")}</td></tr>`)
     .join("") || '<tr><td colspan="2" class="muted">None</td></tr>';
+  return true;
+}
+
+$("btn-login").addEventListener("click", async () => {
+  $("err").textContent = "";
+  const authResp = await fetch(AUTH, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email: $("li-email").value.trim(), password: $("li-pw").value }),
+  });
+  if (!authResp.ok) { $("err").textContent = "Invalid email or password."; return; }
+  const auth = await authResp.json();
+  accessToken = auth.access_token;
+  try { sessionStorage.setItem("hp_dashboard_token", accessToken); } catch {}
+
+  if (!(await loadStats(accessToken))) {
+    $("err").textContent = "Request failed.";
+  }
 });
+
+$("btn-logout").addEventListener("click", () => {
+  accessToken = null;
+  try { sessionStorage.removeItem("hp_dashboard_token"); } catch {}
+  $("dash").classList.add("hidden");
+  $("login").classList.remove("hidden");
+  $("li-pw").value = "";
+});
+
+// Restore a session on page load (refresh) if a token was stored.
+// A stale/expired token just falls back to the login screen, since
+// loadStats() clears it on failure.
+if (accessToken) { loadStats(accessToken); }
 </script>
 </body>
 </html>

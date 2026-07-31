@@ -135,7 +135,7 @@
   <a id="home-link" href="index.html" data-i18n="home">&larr; Home</a>
   <a id="lang-toggle">Español (beta)</a>
 </div>
-<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - results shown are not final</div>
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - incentive amounts are not final</div>
 
 <h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
 <p class="sub" data-i18n="subtitle">Enter your address to see your eligible rebate amount</p>
@@ -259,6 +259,7 @@
         <td class="amt" id="tot-hp"></td></tr>
   </table>
   <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
+  <div class="warn hidden" id="warn-none" data-i18n="warn_none">The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Contact the program to confirm.</div>
   <p class="footnote" data-i18n="amt_note">* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.</p>
 
   <!-- LMI callout. IDENTICAL across Standard and Enhanced tiers by
@@ -289,7 +290,7 @@ const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
 // Cloudflare Turnstile site key. Leave "" to disable the widget
 // (demo only); set it together with TURNSTILE_SECRET at launch.
-const TURNSTILE_SITE_KEY = "";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAEDAvo-afISCIIQY";
 // ------------------------------------------------------------------
 
 const API = `${SUPABASE_URL}/functions/v1/portal-api`;
@@ -481,14 +482,29 @@ $("q-size").addEventListener("change", () => {
   inc.disabled = false;
 });
 
-// Code format check, then the required survey. The code itself is
-// validated on the final submit; a wrong code returns the user to
-// this step with their survey answers retained.
-$("btn-verify").addEventListener("click", () => {
+// Code is checked against the server before showing the survey, so
+// a wrong code is rejected immediately rather than after five
+// questions. It is re-checked (and actually consumed) at final
+// submit, so this call never marks the code used.
+$("btn-verify").addEventListener("click", async () => {
   const code = $("code").value.trim();
   $("err-code").textContent = "";
   if (!/^\d{6}$/.test(code)) {
     $("err-code").textContent = STRINGS[lang].err_code; return;
+  }
+  $("btn-verify").disabled = true;
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "check_code", public_id: selected.public_id,
+                           email: $("email").value.trim(), code,
+                           session_id: SESSION_ID }),
+  });
+  $("btn-verify").disabled = false;
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    $("err-code").textContent = e.error || "Verification failed."; return;
   }
   hide("step-code"); show("step-survey");
 });
@@ -562,11 +578,12 @@ function showResult(d, cooling) {
   // (server-derived; "both" when the type is not_sure). The rule is
   // identical across tiers, so tier-blindness of the layout holds.
   const scen = d.display_scenario || "both";
-  $("row-ac").classList.toggle("hidden", scen === "hp");
-  $("trow-ac").classList.toggle("hidden", scen === "hp");
-  $("row-hp").classList.toggle("hidden", scen === "ac");
-  $("trow-hp").classList.toggle("hidden", scen === "ac");
+  $("row-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
+  $("trow-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
+  $("row-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
+  $("trow-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
   if (cooling === "window_ac") show("warn-window");
+  if (scen === "none") show("warn-none");
   if (d.flag_multifamily) show("warn-mf");
   if (d.flag_new_construction) show("warn-new");
   // LMI callout variant: the "likely" message only when the optional
@@ -620,7 +637,7 @@ $("btn-another").addEventListener("click", () => {
   $("q-income").innerHTML =
     `<option value="prefer_not">${STRINGS[lang].opt_prefer_not}</option>`;
   $("q-income").disabled = true;
-  ["warn-mf", "warn-new", "warn-window", "funds-gen", "funds-lmi"].forEach(
+  ["warn-mf", "warn-new", "warn-window", "warn-none", "funds-gen", "funds-lmi"].forEach(
     (id) => { $(id).classList.add("hidden"); });
   hide("step-result"); hide("step-email"); hide("step-code");
   hide("step-survey");
@@ -660,7 +677,7 @@ $("lmi-learn").addEventListener("click", () => {
 const STRINGS = {
   en: {
     home:"\u2190 Home",
-    demo:"DEMO SYSTEM - results shown are not final",
+    demo:"DEMO SYSTEM - incentive amounts are not final",
     title:"City of Lincoln Heat Pump Rebate",
     subtitle:"Enter your address to see your eligible incentive amounts",
     addr_label:"Enter your address",
@@ -734,6 +751,7 @@ const STRINGS = {
     lmi_head:"Income-qualified households: up to $4,000*",
     lmi_full:"Full conditions",
     warn_window:"Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.",
+    warn_none:"The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Contact the program to confirm.",
     scr_under:"Under",
     scr_over:"Over",
     lmi_likely:"Based on your answers, your household may qualify for the income-qualified incentive: $3,000 from the City plus the $1,000 LES incentive, $4,000 total. The standard amounts above apply if income is not verified.",
@@ -745,7 +763,7 @@ const STRINGS = {
   },
   es: {
     home:"\u2190 Inicio",
-    demo:"SISTEMA DE DEMOSTRACIÓN - los resultados mostrados no son definitivos",
+    demo:"SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
     title:"Reembolso de Bomba de Calor de la Ciudad de Lincoln",
     subtitle:"Ingrese su dirección para ver los montos de incentivo elegibles",
     addr_label:"Ingrese su dirección",
@@ -819,6 +837,7 @@ const STRINGS = {
     lmi_head:"Hogares que califican por ingresos: hasta $4,000*",
     lmi_full:"Condiciones completas",
     warn_window:"El reemplazo de aire de ventana califica cuando la casa no tiene aire acondicionado central. Aplican los montos de reemplazo de AC central mostrados.",
+    warn_none:"El incentivo de la Ciudad requiere reemplazar un aire acondicionado central, una bomba de calor existente, o (si no hay aire acondicionado central) una unidad de ventana. Instalar una bomba de calor sin reemplazar equipo existente puede no ser elegible para el incentivo de la Ciudad - el incentivo de LES arriba sigue aplicando. Contacte al programa para confirmar.",
     scr_under:"Menos de",
     scr_over:"Más de",
     lmi_likely:"Según sus respuestas, su hogar podría calificar para el incentivo por ingresos: $3,000 de la Ciudad más el incentivo de $1,000 de LES, $4,000 en total. Los montos estándar de arriba aplican si el ingreso no se verifica.",

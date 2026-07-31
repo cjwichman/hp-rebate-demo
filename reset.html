@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set a new password - Heat Pump Rebates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#12405e; --navy-deep:#0c2f47; --navy-tint:#eef3f7;
+    --gold:#d9a441; --paper:#f6f4ee; --line:#e4dfd3;
+    --ink:#26323c; --muted:#66727c; --ring:rgba(217,164,65,.45);
+    --alert:#a52323; --ok:#1f7a4d;
+    --sans:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    --slab:"Bitter",Georgia,serif;
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:var(--sans); background:var(--paper); color:var(--ink);
+         max-width:420px; margin:0 auto; padding:20px 16px 48px; line-height:1.5;
+         border-top:4px solid var(--gold); }
+  h1 { font-family:var(--slab); font-size:22px; color:var(--navy);
+       letter-spacing:-0.01em; margin-bottom:20px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px;
+          padding:22px; box-shadow:0 1px 2px rgba(18,47,71,.05), 0 8px 24px rgba(18,47,71,.05); }
+  label { display:block; font-weight:600; font-size:14px; margin-bottom:8px; }
+  input { width:100%; padding:12px 14px; font-size:16px; border:1.5px solid var(--line);
+          border-radius:10px; background:#fff; margin-bottom:14px; font-family:var(--sans); }
+  input:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 3px var(--ring); }
+  button { width:100%; padding:13px; font-size:16px; font-weight:600; font-family:var(--sans);
+           background:var(--navy); color:#fff; border:none; border-radius:10px; cursor:pointer; }
+  button:hover { background:var(--navy-deep); }
+  button:disabled { background:#9aa7b1; cursor:default; }
+  .error { color:var(--alert); font-size:14px; margin-top:10px; }
+  .ok { color:var(--ok); font-size:14px; margin-top:10px; }
+  .hidden { display:none; }
+  .muted { color:var(--muted); font-size:14px; }
+  a { color:var(--navy); }
+</style>
+</head>
+<body>
+
+<h1>Set a new password</h1>
+
+<div class="card" id="form-card">
+  <div id="pre-check" class="muted">Checking your reset link...</div>
+  <div class="hidden" id="form">
+    <label for="pw1">New password (8+ characters)</label>
+    <input id="pw1" type="password" autocomplete="new-password">
+    <label for="pw2">Confirm password</label>
+    <input id="pw2" type="password" autocomplete="new-password">
+    <button id="btn-save">Set password</button>
+    <div class="error" id="err"></div>
+  </div>
+</div>
+
+<div class="hidden card" id="done-card">
+  <p class="ok">Password updated.</p>
+  <p class="muted" style="margin-top:8px">
+    <a id="back-link" href="contractor.html">Continue</a></p>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
+const $ = (id) => document.getElementById(id);
+
+// Supabase's recovery link lands here with the token in the URL
+// fragment (#access_token=...&type=recovery), not the query string.
+const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+const accessToken = params.get("access_token");
+const linkType = params.get("type");
+
+// Which login page to return to. "from=dashboard" is added when the
+// reset request originated on the dashboard's forgot-password link;
+// contractor is the default since it's the more common channel.
+const fromParam = new URLSearchParams(location.search).get("from");
+$("back-link").href = fromParam === "dashboard" ? "dashboard.html" : "contractor.html";
+
+if (!accessToken || linkType !== "recovery") {
+  $("pre-check").textContent =
+    "This link is invalid or has expired. Request a new password reset link from the login page.";
+} else {
+  $("pre-check").classList.add("hidden");
+  $("form").classList.remove("hidden");
+}
+
+$("btn-save").addEventListener("click", async () => {
+  $("err").textContent = "";
+  const pw1 = $("pw1").value, pw2 = $("pw2").value;
+  if (pw1.length < 8) { $("err").textContent = "Password must be at least 8 characters."; return; }
+  if (pw1 !== pw2) { $("err").textContent = "Passwords do not match."; return; }
+  $("btn-save").disabled = true;
+
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ password: pw1 }),
+  });
+  $("btn-save").disabled = false;
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    $("err").textContent = e.error_description || e.msg || "Could not set password. Request a new reset link.";
+    return;
+  }
+  $("form-card").classList.add("hidden");
+  $("done-card").classList.remove("hidden");
+});
+</script>
+</body>
+</html>

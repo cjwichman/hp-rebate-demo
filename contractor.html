@@ -56,6 +56,8 @@
   button.secondary:hover { background:var(--navy-tint); }
   .muted { color:var(--muted); font-size:13px; margin-top:10px; }
   .error { color:#a52323; font-size:14px; margin-top:10px; }
+  .ok { color:var(--ok); font-size:14px; margin-top:10px; }
+  .cp-h { font-family:var(--slab); font-size:18px; color:var(--navy); margin-bottom:16px; }
   .warn { background:var(--warn-bg); border:1px solid var(--warn-line);
           color:var(--warn-ink); border-radius:9px; padding:10px 14px;
           font-size:13px; margin-top:12px; text-align:left; }
@@ -116,7 +118,12 @@
   <a id="home-link" href="index.html" data-i18n="home">&larr; Home</a>
   <a id="lang-toggle">Español (beta)</a>
 </div>
-<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - results shown are not final</div>
+<div class="topbar hidden" id="account-bar" style="font-size:13px;margin-top:-6px">
+  <span></span>
+  <span><a id="to-changepw" data-i18n="change_pw">Change password</a>
+    &middot; <a id="btn-logout" data-i18n="log_out">Log out</a></span>
+</div>
+<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - incentive amounts are not final</div>
 
 <h1 data-i18n="title">Contractor Platform</h1>
 <p class="sub" data-i18n="subtitle">Look up a customer's eligible rebate amount</p>
@@ -134,6 +141,17 @@
   <div class="error" id="err-login"></div>
   <p class="switch"><span data-i18n="no_account">No account?</span>
     <a id="to-signup" data-i18n="to_signup">Create one</a></p>
+  <p class="switch"><a id="to-forgot" data-i18n="forgot_pw">Forgot password?</a></p>
+</div>
+
+<!-- Forgot password: request a reset link -->
+<div class="card hidden" id="forgot">
+  <div class="field"><label for="fp-email" data-i18n="li_email">Email</label>
+  <input id="fp-email" type="email" autocomplete="username"></div>
+  <button id="btn-forgot" data-i18n="btn_forgot">Send reset link</button>
+  <div class="error" id="err-forgot"></div>
+  <div class="ok hidden" id="ok-forgot" data-i18n="forgot_sent">If that email has an account, a reset link is on its way.</div>
+  <p class="switch"><a id="forgot-to-login" data-i18n="btn_login">Log in</a></p>
 </div>
 
 <!-- Signup: invite-gated, one account per person, many per company -->
@@ -162,6 +180,21 @@
     <a id="to-login" data-i18n="btn_login">Log in</a></p>
 </div>
 
+<!-- Change password (logged in) -->
+<div class="card hidden" id="changepw">
+  <h2 class="cp-h" data-i18n="cp_h">Change your password</h2>
+  <div class="field"><label for="cp-old" data-i18n="cp_old">Current password</label>
+  <input id="cp-old" type="password" autocomplete="current-password"></div>
+  <div class="field"><label for="cp-pw1" data-i18n="cp_new">Enter your new password (8+ characters)</label>
+  <input id="cp-pw1" type="password" autocomplete="new-password"></div>
+  <div class="field"><label for="cp-pw2" data-i18n="cp_confirm">Confirm new password</label>
+  <input id="cp-pw2" type="password" autocomplete="new-password"></div>
+  <button id="btn-changepw" data-i18n="btn_changepw">Set new password</button>
+  <div class="error" id="err-changepw"></div>
+  <div class="ok hidden" id="ok-changepw" data-i18n="changepw_done">Password updated.</div>
+  <p class="switch"><a id="changepw-back" data-i18n="cp_back">Back</a></p>
+</div>
+
 <!-- Lookup -->
 <div class="card hidden" id="lookup">
   <label for="q" data-i18n="addr_label">Customer address</label>
@@ -184,6 +217,7 @@
           <td class="amt" id="tot-hp"></td></tr>
     </table>
     <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
+    <div class="warn hidden" id="warn-none" data-i18n="warn_none">The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Confirm with the program.</div>
     <p class="muted" style="font-size:12px;margin-top:8px" data-i18n="amt_note">* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.</p>
     <p class="warn hidden" id="funds-lmi" style="margin:8px 0"></p>
     <div class="lmi"><span data-i18n="lmi_note">Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.</span>
@@ -251,7 +285,7 @@ const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
 // Cloudflare Turnstile site key. Leave "" to disable the widget
 // (demo only); set it together with TURNSTILE_SECRET at launch.
-const TURNSTILE_SITE_KEY = "";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAEDAvo-afISCIIQY";
 // Support contact for signup problems. Leave "" to hide the line;
 // set once the program domain and mailbox exist.
 const SUPPORT_EMAIL = "";
@@ -314,6 +348,7 @@ $("btn-login").addEventListener("click", async () => {
   $("login").classList.add("hidden");
   $("signup").classList.add("hidden");
   $("lookup").classList.remove("hidden");
+  $("account-bar").classList.remove("hidden");
   $("q").focus();
 });
 
@@ -344,6 +379,92 @@ $("to-signup").addEventListener("click", async () => {
 $("to-login").addEventListener("click", () => {
   $("signup").classList.add("hidden");
   $("login").classList.remove("hidden");
+});
+
+// ---- Forgot password ----
+$("to-forgot").addEventListener("click", () => {
+  $("login").classList.add("hidden"); $("forgot").classList.remove("hidden");
+});
+$("forgot-to-login").addEventListener("click", () => {
+  $("forgot").classList.add("hidden"); $("login").classList.remove("hidden");
+});
+$("btn-forgot").addEventListener("click", async () => {
+  $("err-forgot").textContent = ""; $("ok-forgot").classList.add("hidden");
+  const email = $("fp-email").value.trim();
+  if (!email) { $("err-forgot").textContent = "Enter your email."; return; }
+  // The response does not reveal whether the account exists, so the
+  // confirmation message is the same either way.
+  await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email, options: { redirect_to: `${location.origin}/reset.html` } }),
+  }).catch(() => {});
+  $("ok-forgot").classList.remove("hidden");
+});
+
+// ---- Change password (while logged in) ----
+$("to-changepw").addEventListener("click", () => {
+  $("lookup").classList.add("hidden"); $("changepw").classList.remove("hidden");
+  $("account-bar").classList.add("hidden");
+  $("cp-pw1").value = ""; $("cp-pw2").value = "";
+  $("err-changepw").textContent = ""; $("ok-changepw").classList.add("hidden");
+});
+$("changepw-back").addEventListener("click", () => {
+  $("changepw").classList.add("hidden"); $("lookup").classList.remove("hidden");
+  $("account-bar").classList.remove("hidden");
+});
+$("btn-logout").addEventListener("click", () => {
+  accessToken = null;
+  try { sessionStorage.removeItem("hp_contractor_token"); } catch {}
+  $("lookup").classList.add("hidden");
+  $("changepw").classList.add("hidden");
+  $("account-bar").classList.add("hidden");
+  $("login").classList.remove("hidden");
+  $("li-pw").value = "";
+});
+
+$("btn-changepw").addEventListener("click", async () => {
+  $("err-changepw").textContent = "";
+  const oldPw = $("cp-old").value;
+  const pw1 = $("cp-pw1").value, pw2 = $("cp-pw2").value;
+  if (!oldPw) { $("err-changepw").textContent = "Enter your current password."; return; }
+  if (pw1.length < 8) { $("err-changepw").textContent = "New password must be at least 8 characters."; return; }
+  if (pw1 !== pw2) { $("err-changepw").textContent = "New passwords do not match."; return; }
+
+  // Confirm the current password before applying a new one - a
+  // valid session alone (e.g. an unattended logged-in browser)
+  // should not be enough to lock the real owner out. The email
+  // field on the login card may be empty on a restored session, so
+  // look up the account's own email first (a stateless read, safe
+  // on the shared client - unlike signInWithPassword, it never
+  // changes what the session is authenticated as).
+  const who = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+  });
+  if (!who.ok) {
+    $("err-changepw").textContent = "Session expired. Log out and back in, then try again."; return;
+  }
+  const whoData = await who.json();
+  const check = await fetch(AUTH, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email: whoData.email, password: oldPw }),
+  });
+  if (!check.ok) {
+    $("err-changepw").textContent = "Current password is incorrect."; return;
+  }
+
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ password: pw1 }),
+  });
+  if (!r.ok) {
+    $("err-changepw").textContent = "Could not update password. Log out and back in, then try again.";
+    return;
+  }
+  $("ok-changepw").classList.remove("hidden");
 });
 $("su-company").addEventListener("change", () => {
   $("su-other-wrap").classList.toggle("hidden", $("su-company").value !== "other");
@@ -525,6 +646,7 @@ async function doLookup(row, answers) {
     accessToken = null;
     try { sessionStorage.removeItem("hp_contractor_token"); } catch {}
     $("lookup").classList.add("hidden");
+    $("account-bar").classList.add("hidden");
     $("login").classList.remove("hidden");
     $("err-login").textContent = STRINGS[lang].err_session;
     return;
@@ -547,11 +669,12 @@ async function doLookup(row, answers) {
   // Show only the rows for the reported replacement type; identical
   // rule across tiers
   const scen = d.display_scenario || "both";
-  $("row-ac").classList.toggle("hidden", scen === "hp");
-  $("trow-ac").classList.toggle("hidden", scen === "hp");
-  $("row-hp").classList.toggle("hidden", scen === "ac");
-  $("trow-hp").classList.toggle("hidden", scen === "ac");
+  $("row-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
+  $("trow-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
+  $("row-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
+  $("trow-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
   $("warn-window").classList.toggle("hidden", $("q-cooling").value !== "window_ac");
+  $("warn-none").classList.toggle("hidden", scen !== "none");
   // Funds-expended kill switches, mirroring the household page.
   const funds = d.funds || {};
   const fmtDate = (iso) => iso
@@ -587,7 +710,7 @@ async function doLookup(row, answers) {
 const STRINGS = {
   en: {
     home:"\u2190 Home",
-    demo:"DEMO SYSTEM - results shown are not final",
+    demo:"DEMO SYSTEM - incentive amounts are not final",
     title:"Contractor Platform",
     subtitle:"Look up a customer's eligible incentive amounts",
     row_les:"LES incentive - eligible to all LES customers installing a high-efficiency heat pump",
@@ -623,6 +746,18 @@ const STRINGS = {
     li_pw:"Password",
     no_account:"No account?",
     to_signup:"Create one",
+    forgot_pw:"Forgot password?",
+    btn_forgot:"Send reset link",
+    forgot_sent:"If that email has an account, a reset link is on its way.",
+    change_pw:"Change password",
+    log_out:"Log out",
+    cp_h:"Change your password",
+    cp_old:"Current password",
+    cp_new:"Enter your new password (8+ characters)",
+    cp_confirm:"Confirm new password",
+    btn_changepw:"Set new password",
+    changepw_done:"Password updated.",
+    cp_back:"Back",
     have_account:"Already have an account?",
     su_invite:"Invite code",
     su_invite_note:"Provided by the program to participating contractors.",
@@ -655,6 +790,7 @@ const STRINGS = {
     opt_yes:"Yes",
     opt_no:"No",
     warn_window:"Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.",
+    warn_none:"The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Confirm with the program.",
     opt_lt5:"Under 5 years",
     opt_unknown:"Don't know",
     btn_survey:"Look up rebate amounts",
@@ -672,7 +808,7 @@ const STRINGS = {
   },
   es: {
     home:"\u2190 Inicio",
-    demo:"SISTEMA DE DEMOSTRACIÓN - los resultados mostrados no son definitivos",
+    demo:"SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
     title:"Plataforma de Contratistas",
     subtitle:"Consulte los montos de incentivo elegibles de un cliente",
     row_les:"Incentivo de LES - elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia",
@@ -708,6 +844,18 @@ const STRINGS = {
     li_pw:"Contraseña",
     no_account:"¿No tiene cuenta?",
     to_signup:"Crear una",
+    forgot_pw:"¿Olvidó su contraseña?",
+    btn_forgot:"Enviar enlace de restablecimiento",
+    forgot_sent:"Si ese correo tiene una cuenta, un enlace de restablecimiento está en camino.",
+    change_pw:"Cambiar contraseña",
+    log_out:"Cerrar sesión",
+    cp_h:"Cambiar su contraseña",
+    cp_old:"Contraseña actual",
+    cp_new:"Ingrese su nueva contraseña (8+ caracteres)",
+    cp_confirm:"Confirmar nueva contraseña",
+    btn_changepw:"Establecer nueva contraseña",
+    changepw_done:"Contraseña actualizada.",
+    cp_back:"Volver",
     have_account:"¿Ya tiene una cuenta?",
     su_invite:"Código de invitación",
     su_invite_note:"Proporcionado por el programa a los contratistas participantes.",
@@ -740,6 +888,7 @@ const STRINGS = {
     opt_yes:"Sí",
     opt_no:"No",
     warn_window:"El reemplazo de aire de ventana califica cuando la casa no tiene aire acondicionado central. Aplican los montos de reemplazo de AC central mostrados.",
+    warn_none:"El incentivo de la Ciudad requiere reemplazar un aire acondicionado central, una bomba de calor existente, o (si no hay aire acondicionado central) una unidad de ventana. Instalar una bomba de calor sin reemplazar equipo existente puede no ser elegible para el incentivo de la Ciudad - el incentivo de LES arriba sigue aplicando. Confirme con el programa.",
     opt_lt5:"Menos de 5 años",
     opt_unknown:"No sé",
     btn_survey:"Consultar montos de reembolso",
@@ -761,6 +910,7 @@ const STRINGS = {
 if (accessToken) {
   $("login").classList.add("hidden");
   $("lookup").classList.remove("hidden");
+  $("account-bar").classList.remove("hidden");
 }
 
 // Support line renders only when a contact is configured
