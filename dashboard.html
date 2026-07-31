@@ -3,33 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Research Dashboard - Heat Pump Rebate Portal</title>
+<title>Research Dashboard - Heat Pump Rebates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --blue:#155e75; --green:#15803d; --bg:#f4f6f8; --border:#e2e8f0; }
+  /* Matches the public pages: navy/gold civic palette, Public Sans
+     text, Bitter slab for headings and figures. */
+  :root {
+    --navy:#12405e; --navy-deep:#0c2f47; --navy-tint:#eef3f7;
+    --gold:#d9a441; --gold-soft:#f8efdd; --paper:#f6f4ee; --line:#e4dfd3;
+    --ink:#26323c; --muted:#66727c; --ring:rgba(217,164,65,.45);
+    --ok:#1f7a4d; --alert:#a52323;
+    --sans:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    --slab:"Bitter",Georgia,serif;
+  }
   * { box-sizing:border-box; }
-  body { font-family:-apple-system,Segoe UI,Arial,sans-serif; background:var(--bg);
-         max-width:860px; margin:0 auto; padding:16px; color:#212f3c; }
-  h1 { font-size:22px; color:var(--blue); margin:8px 0 16px; }
-  .card { background:#fff; border:1px solid var(--border); border-radius:8px;
-          padding:20px; margin-bottom:16px; }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  body { font-family:var(--sans); background:var(--paper); max-width:960px;
+         margin:0 auto; padding:16px; color:var(--ink);
+         border-top:4px solid var(--gold); }
+  h1 { font-family:var(--slab); font-size:22px; color:var(--navy); margin:8px 0 16px; }
+  h2 { font-family:var(--slab); font-size:16px; margin:4px 0 8px; color:var(--navy); }
+  h3 { font-size:14px; margin:12px 0 4px; color:var(--ink); font-weight:600; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px;
+          padding:20px; margin-bottom:16px;
+          box-shadow:0 1px 2px rgba(18,47,71,.05), 0 8px 24px rgba(18,47,71,.05); }
   label { display:block; font-weight:600; font-size:14px; margin-bottom:6px; }
-  input { width:100%; padding:11px; font-size:16px; border:1px solid var(--border);
-          border-radius:6px; }
-  button { padding:11px 20px; font-size:15px; background:var(--blue); color:#fff;
-           border:none; border-radius:6px; cursor:pointer; margin-top:12px; }
-  .error { color:#c0392b; font-size:14px; margin-top:10px; }
+  input { width:100%; padding:11px; font-size:16px; border:1.5px solid var(--line);
+          border-radius:10px; font-family:var(--sans); }
+  input:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 3px var(--ring); }
+  button { padding:11px 20px; font-size:15px; background:var(--navy); color:#fff;
+           border:none; border-radius:10px; cursor:pointer; margin-top:12px;
+           font-family:var(--sans); font-weight:600; transition:background .15s; }
+  button:hover { background:var(--navy-deep); }
+  button:focus-visible { outline:none; box-shadow:0 0 0 3px var(--ring); }
+  .error { color:var(--alert); font-size:14px; margin-top:10px; }
   .hidden { display:none; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
-  .stat { background:#eaf2f8; border-radius:6px; padding:14px; text-align:center; }
-  .stat .n { font-size:28px; font-weight:700; color:var(--blue); }
-  .stat .l { font-size:12px; color:#5d6d7e; margin-top:4px; }
+  .stat { background:var(--navy-tint); border-radius:10px; padding:14px; text-align:center; }
+  .stat .n { font-family:var(--slab); font-size:28px; font-weight:700; color:var(--navy);
+             font-variant-numeric:tabular-nums; }
+  .stat .l { font-size:12px; color:var(--muted); margin-top:4px; }
+  .stat.alert { background:#faeceb; }
+  .stat.alert .n { color:var(--alert); }
   table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
-  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid #eee; }
-  th { color:#5d6d7e; font-weight:600; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid #efece3; }
+  th { color:var(--muted); font-weight:600; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
   .bar-row { display:flex; align-items:center; gap:8px; font-size:12px; margin:2px 0; }
-  .bar { background:var(--blue); height:14px; border-radius:2px; }
-  .muted { color:#5d6d7e; font-size:13px; }
-  h2 { font-size:16px; margin:4px 0 8px; color:var(--blue); }
+  .bar { background:var(--navy); height:14px; border-radius:3px; }
+  .bar.enh { background:var(--gold); }
+  .muted { color:var(--muted); font-size:13px; }
+  .legend { font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .legend .sw { display:inline-block; width:10px; height:10px; border-radius:2px;
+                margin:0 4px 0 10px; }
 </style>
 </head>
 <body>
@@ -45,7 +73,7 @@
 
 <div class="hidden" id="dash">
   <div class="card">
-    <h2>Household portal activity (search &rarr; verify &rarr; view)</h2>
+    <h2>Household site activity (search &rarr; verify &rarr; view)</h2>
     <div class="grid">
       <div class="stat"><div class="n" id="s-sessions">-</div><div class="l">Unique visits (sessions)</div></div>
       <div class="stat"><div class="n" id="s-selections">-</div><div class="l">Addresses selected</div></div>
@@ -68,8 +96,66 @@
   </div>
 
   <div class="card">
-    <h2>Rebate results viewed per day</h2>
+    <h2>Premise coverage</h2>
+    <p class="muted">Repeat reveals per premise, and premises surfaced in searches that never reached a reveal or contractor lookup.</p>
+    <div class="grid">
+      <div class="stat"><div class="n" id="s-prem-revealed">-</div><div class="l">Premises revealed</div></div>
+      <div class="stat"><div class="n" id="s-prem-repeat">-</div><div class="l">Premises revealed 2+ times</div></div>
+      <div class="stat"><div class="n" id="s-sugg-never">-</div><div class="l">Suggested, never revealed</div></div>
+      <div class="stat"><div class="n" id="s-sel-never">-</div><div class="l">Selected, never revealed</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Rebate results viewed per day, by assignment</h2>
+    <div class="legend">Standard<span class="sw" style="background:var(--navy)"></span>
+      Enhanced<span class="sw" style="background:var(--gold)"></span></div>
     <div id="daily"></div>
+  </div>
+
+  <div class="card">
+    <h2>Pre-reveal survey responses</h2>
+    <p class="muted">Response distributions by channel (household vs contractor) and by tier. Income perception is household-only.</p>
+    <div id="survey-dists"></div>
+  </div>
+
+  <div class="card">
+    <h2>LMI screener and information requests (household)</h2>
+    <div class="grid">
+      <div class="stat"><div class="n" id="s-scr-takes">-</div><div class="l">Screener uses</div></div>
+      <div class="stat"><div class="n" id="s-scr-rate">-</div><div class="l">Take rate (per reveal)</div></div>
+      <div class="stat"><div class="n" id="s-scr-likely">-</div><div class="l">Likely-LMI share of takers</div></div>
+    </div>
+    <h3>Info requests by tier</h3>
+    <table id="info-tier"><thead><tr><th>Tier</th><th class="num">Yes</th><th class="num">No</th><th class="num">Yes rate</th></tr></thead><tbody></tbody></table>
+    <h3>Info requests by pre-reveal income perception</h3>
+    <table id="info-perc"><thead><tr><th>Perceived qualifies</th><th class="num">Yes</th><th class="num">No</th><th class="num">Yes rate</th></tr></thead><tbody></tbody></table>
+    <h3>Perceived vs screener-likely (misperception)</h3>
+    <p class="muted">Rows: pre-reveal answer to the income-perception question. Columns: screener result for the same premise.</p>
+    <table id="crosstab"><thead><tr><th>Perceived</th><th class="num">Likely qualifies</th><th class="num">Likely does not</th></tr></thead><tbody></tbody></table>
+  </div>
+
+  <div class="card">
+    <h2>Contractor accounts</h2>
+    <p class="muted">Lookup volume per account and per company. Accounts above the alert threshold are highlighted.</p>
+    <div class="grid" style="margin-bottom:8px">
+      <div class="stat" id="wrap-highvol"><div class="n" id="s-highvol">-</div><div class="l">Accounts over threshold (<span id="s-threshold">-</span>)</div></div>
+    </div>
+    <h3>By company</h3>
+    <table id="by-company"><thead><tr><th>Company</th><th class="num">Lookups</th></tr></thead><tbody></tbody></table>
+    <h3>By account</h3>
+    <table id="by-account"><thead><tr><th>Account</th><th class="num">Lookups</th></tr></thead><tbody></tbody></table>
+    <h3>Companies pending admin review (free-text signups)</h3>
+    <div id="pending" class="muted">-</div>
+  </div>
+
+  <div class="card">
+    <h2>Abuse protection</h2>
+    <div class="grid">
+      <div class="stat"><div class="n" id="s-ratelim">-</div><div class="l">Rate-limit rejections</div></div>
+      <div class="stat"><div class="n" id="s-turnstile">-</div><div class="l">Turnstile rejections</div></div>
+      <div class="stat"><div class="n" id="s-surej">-</div><div class="l">Signup rejections</div></div>
+    </div>
   </div>
 
   <div class="card">
@@ -83,10 +169,13 @@
 // ---- Configuration: set these to your Supabase project values ----
 const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
+// Highlight contractor accounts above this many lookups (full history)
+const HIGH_VOLUME_ALERT = 100;
 // ------------------------------------------------------------------
 
 const API = `${SUPABASE_URL}/functions/v1/portal-api`;
 const $ = (id) => document.getElementById(id);
+const pct = (num, den) => den ? Math.round((num / den) * 100) + "%" : "-";
 
 $("btn-login").addEventListener("click", async () => {
   $("err").textContent = "";
@@ -114,17 +203,96 @@ $("btn-login").addEventListener("click", async () => {
   $("s-multi").textContent = d.multi_address_emails ?? "-";
   $("s-codefail").textContent = d.codes_failed;
 
-  // Daily reveal bars (simple horizontal bars, no chart library needed)
-  const days = Object.keys(d.daily_reveals).sort();
-  const max = Math.max(1, ...Object.values(d.daily_reveals));
+  $("s-prem-revealed").textContent = d.premises_revealed ?? "-";
+  $("s-prem-repeat").textContent = d.premises_revealed_repeat ?? "-";
+  $("s-sugg-never").textContent = d.suggested_never_revealed ?? "-";
+  $("s-sel-never").textContent = d.selected_never_revealed ?? "-";
+
+  // Daily reveals, one paired bar row per day (Standard then Enhanced)
+  const daily = d.daily_reveals_by_tier || {};
+  const days = Object.keys(daily).sort();
+  const max = Math.max(1, ...days.map((k) => Math.max(daily[k].Standard, daily[k].Enhanced)));
   $("daily").innerHTML = days.length
     ? days.map((day) => {
-        const n = d.daily_reveals[day];
+        const s = daily[day].Standard, e = daily[day].Enhanced;
         return `<div class="bar-row"><span style="width:80px">${day}</span>
-                <div class="bar" style="width:${(n / max) * 70}%"></div>
-                <span>${n}</span></div>`;
+                <div style="flex:1">
+                  <div class="bar" style="width:${(s / max) * 70}%"></div>
+                  <div class="bar enh" style="width:${(e / max) * 70}%"></div>
+                </div><span>${s} / ${e}</span></div>`;
       }).join("")
     : '<p class="muted">No rebate results viewed yet.</p>';
+
+  // Survey distributions: one table per question, columns per response
+  const QLABEL = {
+    is_system_working: "Is the current system working?",
+    replacing_what: "What is being replaced?",
+    system_age: "System age",
+    lmi_perceived: "Perceived income-tier qualification (household only)",
+  };
+  const dists = d.survey_distributions || {};
+  $("survey-dists").innerHTML = Object.keys(QLABEL).map((q) => {
+    const dist = dists[q];
+    if (!dist) return "";
+    const vals = new Set();
+    for (const grp of Object.values(dist.by_channel)) Object.keys(grp).forEach((v) => vals.add(v));
+    for (const grp of Object.values(dist.by_tier)) Object.keys(grp).forEach((v) => vals.add(v));
+    const cols = [...vals].sort();
+    const row = (label, grp) =>
+      `<tr><td>${label}</td>` +
+      cols.map((c) => `<td class="num">${grp?.[c] ?? 0}</td>`).join("") + "</tr>";
+    const groups = [
+      ...Object.entries(dist.by_channel).map(([g, grp]) => row("channel: " + g, grp)),
+      ...Object.entries(dist.by_tier).map(([g, grp]) => row("tier: " + g, grp)),
+    ];
+    if (!cols.length) return "";
+    return `<h3>${QLABEL[q]}</h3>
+      <table><thead><tr><th></th>${cols.map((c) => `<th class="num">${c}</th>`).join("")}</tr></thead>
+      <tbody>${groups.join("")}</tbody></table>`;
+  }).join("") || '<p class="muted">No survey responses yet.</p>';
+
+  // LMI screener and info requests
+  $("s-scr-takes").textContent = d.lmi_screener_takes ?? "-";
+  $("s-scr-rate").textContent =
+    pct(d.lmi_screener_takes, d.lmi_screener_take_rate_denominator);
+  $("s-scr-likely").textContent = d.lmi_screener_likely_share == null
+    ? "-" : Math.round(d.lmi_screener_likely_share * 100) + "%";
+  const fillYesNo = (tableId, obj) => {
+    $(tableId).querySelector("tbody").innerHTML =
+      Object.entries(obj || {}).map(([k, v]) =>
+        `<tr><td>${k}</td><td class="num">${v.yes}</td><td class="num">${v.no}</td>
+         <td class="num">${pct(v.yes, v.yes + v.no)}</td></tr>`).join("") ||
+      '<tr><td colspan="4" class="muted">None</td></tr>';
+  };
+  fillYesNo("info-tier", d.lmi_info_by_tier);
+  fillYesNo("info-perc", d.lmi_info_by_perceived);
+  $("crosstab").querySelector("tbody").innerHTML =
+    Object.entries(d.lmi_crosstab || {}).map(([k, v]) =>
+      `<tr><td>${k}</td><td class="num">${v.likely}</td><td class="num">${v.not_likely}</td></tr>`)
+      .join("") || '<tr><td colspan="3" class="muted">None</td></tr>';
+
+  // Contractor volume
+  $("s-threshold").textContent = HIGH_VOLUME_ALERT;
+  const accounts = Object.entries(d.lookups_by_account || {}).sort((a, b) => b[1] - a[1]);
+  const overThreshold = accounts.filter(([, n]) => n >= HIGH_VOLUME_ALERT).length;
+  $("s-highvol").textContent = overThreshold;
+  if (overThreshold > 0) $("wrap-highvol").classList.add("alert");
+  $("by-account").querySelector("tbody").innerHTML =
+    accounts.map(([id, n]) =>
+      `<tr${n >= HIGH_VOLUME_ALERT ? ' style="color:#c0392b;font-weight:700"' : ""}>
+       <td>${id.slice(0, 8)}...</td><td class="num">${n}</td></tr>`).join("") ||
+    '<tr><td colspan="2" class="muted">None</td></tr>';
+  $("by-company").querySelector("tbody").innerHTML =
+    Object.entries(d.lookups_by_company || {}).sort((a, b) => b[1] - a[1])
+      .map(([name, n]) => `<tr><td>${name}</td><td class="num">${n}</td></tr>`).join("") ||
+    '<tr><td colspan="2" class="muted">None</td></tr>';
+  $("pending").textContent =
+    (d.companies_pending_review || []).join(", ") || "None";
+
+  // Abuse protection
+  $("s-ratelim").textContent = d.rate_limited ?? 0;
+  $("s-turnstile").textContent = d.turnstile_failed ?? 0;
+  $("s-surej").textContent = d.signup_rejected ?? 0;
 
   const tb = $("failed").querySelector("tbody");
   tb.innerHTML = (d.recent_failed_queries || [])

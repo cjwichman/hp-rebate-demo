@@ -3,70 +3,112 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contractor Portal - Heat Pump Rebate Verification</title>
+<title>Contractor Platform - Heat Pump Rebate Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Design tokens: Nebraska civic navy and harvest gold; Public Sans
+     (the U.S. federal open typeface) for text, Bitter slab for
+     headings and dollar figures - a utility-ledger feel. */
   :root {
-    --blue:#155e75; --blue-dark:#0e4a5c; --green:#15803d;
-    --bg:#f4f6f8; --card:#ffffff; --border:#e2e8f0; --text:#1e293b;
-    --muted:#64748b; --ring:rgba(21,94,117,.25);
+    --navy:#12405e; --navy-deep:#0c2f47; --navy-tint:#eef3f7;
+    --gold:#d9a441; --gold-soft:#f8efdd; --gold-line:#e8cf9d;
+    --paper:#f6f4ee; --card:#ffffff; --line:#e4dfd3;
+    --ink:#26323c; --muted:#66727c; --ring:rgba(217,164,65,.45);
+    --ok:#1f7a4d; --warn-bg:#fdf3e3; --warn-line:#e5b96b; --warn-ink:#6b4a12;
+    --sans:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    --slab:"Bitter",Georgia,"Times New Roman",serif;
   }
   * { box-sizing:border-box; margin:0; }
-  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
-         background:var(--bg); color:var(--text); max-width:520px; margin:0 auto;
-         padding:20px 16px 48px; line-height:1.5; }
-  .topbar { display:flex; justify-content:space-between; align-items:center;
-            font-size:14px; margin-bottom:12px; }
-  .topbar a { color:var(--blue); text-decoration:none; cursor:pointer; }
-  .topbar a:hover { text-decoration:underline; }
-  .demo-banner { background:#fef9c3; border:1px solid #eab308; color:#713f12;
-         padding:8px 14px; border-radius:8px; font-size:13px; text-align:center;
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  body { font-family:var(--sans); background:var(--paper); color:var(--ink);
+         max-width:520px; margin:0 auto; padding:20px 16px 48px; line-height:1.55;
+         border-top:4px solid var(--gold); }
+  h1 { font-family:var(--slab); font-size:24px; font-weight:700; color:var(--navy);
+       letter-spacing:-0.01em; }
+  .sub { color:var(--muted); font-size:14px; margin:6px 0 20px; }
+  .demo-banner { background:#fdf6cf; border:1px solid #d9b13b; color:#6b5312;
+         padding:8px 14px; border-radius:9px; font-size:12.5px; text-align:center;
+         letter-spacing:.04em; text-transform:uppercase; font-weight:600;
          margin-bottom:14px; }
-  h1 { font-size:22px; font-weight:700; color:var(--blue); letter-spacing:-0.01em; }
-  .sub { color:var(--muted); font-size:14px; margin:4px 0 20px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
-          padding:22px; margin-bottom:16px; box-shadow:0 1px 3px rgba(15,23,42,.06); }
-  label { display:block; font-weight:600; font-size:14px; margin-bottom:8px; }
-  input { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--border);
-          border-radius:8px; background:#fff; transition:border-color .15s, box-shadow .15s; }
-  input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px var(--ring); }
-  button { width:100%; padding:12px; font-size:16px; font-weight:600; background:var(--blue);
-           color:#fff; border:none; border-radius:8px; cursor:pointer; margin-top:14px;
-           transition:background .15s; }
-  button:hover { background:var(--blue-dark); }
-  #suggestions { border:1px solid var(--border); border-radius:8px; background:#fff;
-                 max-height:280px; overflow-y:auto; display:none; margin-top:6px;
-                 box-shadow:0 4px 12px rgba(15,23,42,.08); }
-  .sug { padding:11px 14px; cursor:pointer; font-size:15px; }
-  .sug + .sug { border-top:1px solid #f1f5f9; }
-  .sug:hover, .sug.active { background:#e8f1f5; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
+          padding:22px; margin-bottom:16px;
+          box-shadow:0 1px 2px rgba(18,47,71,.05), 0 8px 24px rgba(18,47,71,.05); }
+  label { display:block; font-weight:600; font-size:14px; margin-bottom:8px;
+          color:var(--ink); }
+  input, select { width:100%; padding:12px 14px; font-size:16px; color:var(--ink);
+          border:1.5px solid var(--line); border-radius:10px; background:#fff;
+          transition:border-color .15s, box-shadow .15s; font-family:var(--sans); }
+  select { margin-bottom:14px; }
+  input:focus, select:focus { outline:none; border-color:var(--navy);
+          box-shadow:0 0 0 3px var(--ring); }
+  button { width:100%; padding:13px; font-size:16px; font-weight:600;
+           font-family:var(--sans); background:var(--navy); color:#fff; border:none;
+           border-radius:10px; cursor:pointer; margin-top:14px;
+           transition:background .15s, transform .1s; }
+  button:hover { background:var(--navy-deep); }
+  button:active { transform:translateY(1px); }
+  button:focus-visible { outline:none; box-shadow:0 0 0 3px var(--ring); }
+  button:disabled { background:#9aa7b1; cursor:default; transform:none; }
+  button.secondary { background:#fff; color:var(--navy);
+                     border:1.5px solid var(--navy); }
+  button.secondary:hover { background:var(--navy-tint); }
   .muted { color:var(--muted); font-size:13px; margin-top:10px; }
-  .error { color:#b91c1c; font-size:14px; margin-top:10px; }
-  .resbox { background:#e8f1f5; border:1px solid var(--blue); border-radius:10px;
-            padding:16px; margin-top:14px; display:none; }
-  .resbox .tier { font-size:24px; font-weight:700; color:var(--green); margin-top:4px; }
-  .warn { background:#fff7ed; border:1px solid #fdba74; color:#7c2d12; border-radius:8px;
-          padding:10px 14px; font-size:13px; margin-top:10px; }
+  .error { color:#a52323; font-size:14px; margin-top:10px; }
+  .warn { background:var(--warn-bg); border:1px solid var(--warn-line);
+          color:var(--warn-ink); border-radius:9px; padding:10px 14px;
+          font-size:13px; margin-top:12px; text-align:left; }
   .hidden { display:none; }
-  table.amounts { width:100%; border-collapse:collapse; margin:10px 0 2px; text-align:left; }
-  table.amounts td { padding:8px 4px; border-bottom:1px solid #dbeafe; font-size:13px; }
-  table.amounts td.amt { text-align:right; font-weight:700; color:var(--green);
-                         white-space:nowrap; font-size:15px; }
-  table.amounts tr.total td { border-top:2px solid #93c5fd; border-bottom:none;
-                              font-weight:700; color:var(--text); }
-  table.amounts tr.total td.amt { font-size:16px; }
-  .lmi { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; border-radius:8px;
-         padding:9px 12px; font-size:12px; margin-top:10px; }
-  .links { font-size:12px; margin-top:10px; }
-  .links a { color:var(--blue); }
+  .links { font-size:13px; margin-top:12px; }
+  .links a, a { color:var(--navy); }
   details { font-size:13px; color:var(--muted); text-align:left; }
-  details summary { cursor:pointer; color:var(--blue); font-weight:600; }
+  details summary { cursor:pointer; color:var(--navy); font-weight:600; }
   details ul { margin:6px 0 10px 18px; padding:0; }
   details li { margin-bottom:5px; }
-  .elig { background:var(--card); border:1px solid var(--border); border-radius:12px;
-          padding:14px 18px; margin-bottom:16px; box-shadow:0 1px 3px rgba(15,23,42,.06); }
-  .elig-h { font-weight:700; color:var(--text); margin:10px 0 2px; }
+  .elig { background:var(--card); border:1px solid var(--line); border-radius:14px;
+          padding:14px 18px; margin-bottom:16px;
+          box-shadow:0 1px 2px rgba(18,47,71,.05); }
+  .elig-h { font-weight:700; color:var(--ink); margin:10px 0 2px; }
   .elig p { margin:4px 0; }
+  table.amounts { width:100%; border-collapse:collapse; margin:14px 0 4px;
+                  text-align:left; }
+  table.amounts td { padding:10px 4px; border-bottom:1px solid #efece3;
+                     font-size:14px; }
+  table.amounts td.amt { text-align:right; font-family:var(--slab); font-weight:700;
+                         color:var(--ok); white-space:nowrap; font-size:16px;
+                         font-variant-numeric:tabular-nums; }
+  table.amounts tr.total td { border-top:2px solid var(--navy); border-bottom:none;
+                              font-weight:700; color:var(--ink);
+                              background:var(--gold-soft); }
+  table.amounts tr.total td:first-child { border-radius:0 0 0 8px; }
+  table.amounts tr.total td:last-child { border-radius:0 0 8px 0; }
+  table.amounts tr.total td.amt { font-size:18px; color:var(--navy); }
+  .footnote { font-size:12px; color:var(--muted); text-align:left; margin-top:10px; }
+  .topbar { display:flex; justify-content:space-between; align-items:center;
+            font-size:14px; margin-bottom:12px; }
+  .topbar a { color:var(--navy); text-decoration:none; cursor:pointer; }
+  .topbar a:hover { text-decoration:underline; }
+
+  #survey label { color:var(--navy); font-weight:500; }
+  #suggestions { border:1px solid var(--line); border-radius:10px; background:#fff;
+                 max-height:280px; overflow-y:auto; display:none; margin-top:6px;
+                 box-shadow:0 10px 28px rgba(18,47,71,.12); }
+  .sug { padding:11px 14px; cursor:pointer; font-size:15px; }
+  .sug + .sug { border-top:1px solid #f2efe7; }
+  .sug:hover, .sug.active { background:var(--navy-tint); }
+  .field { margin-bottom:14px; }
+  .field .svy-note { margin:6px 0 0; }
+  .switch { font-size:14px; margin-top:14px; text-align:center; }
+  .switch a { color:var(--navy); cursor:pointer; }
+  .resbox { display:none; background:var(--navy-tint); border:1px solid var(--navy);
+            border-radius:12px; padding:16px; margin-top:16px; text-align:left; }
+  .svy-note { font-size:13px; color:var(--muted); margin:-6px 0 14px; }
+  .lmi { background:#fdfaf2; border:1px solid var(--gold-line);
+         border-left:4px solid var(--gold); color:var(--navy); border-radius:9px;
+         padding:10px 14px; font-size:13px; margin-top:12px; text-align:left; }
 </style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
 
@@ -76,44 +118,48 @@
 </div>
 <div class="demo-banner" data-i18n="demo">DEMO SYSTEM - results shown are not final</div>
 
-<h1 data-i18n="title">Contractor Portal</h1>
+<h1 data-i18n="title">Contractor Platform</h1>
 <p class="sub" data-i18n="subtitle">Look up a customer's eligible rebate amount</p>
 
 <!-- Eligibility details (exact City of Lincoln program language) -->
-<details class="elig">
-  <summary data-i18n="elig_summary">Program eligibility details</summary>
-  <p class="elig-h" data-i18n="elig_who_h">Who is eligible:</p>
-  <p data-i18n="elig_who_intro">Residents of the City of Lincoln who:</p>
-  <ul>
-    <li data-i18n="elig_who_1">Live in or own and rent out a single-family detached home (rental units not eligible for the LMI incentive)</li>
-    <li data-i18n="elig_who_2">Live in and own a row home, town home, condo, or duplex</li>
-  </ul>
-  <p class="elig-h" data-i18n="elig_what_h">What is eligible:</p>
-  <ul>
-    <li data-i18n="elig_what_1">The purchase and installation of air source heat pumps or mini-split heat pumps</li>
-    <li data-i18n="elig_what_2">Heat pumps must replace an existing heat pump or central air conditioner that is at least five years old. Window air conditioners are also eligible for replacement with a heat pump when the property has no central air conditioning. A heat pump may be paired with either a gas or electric furnace.</li>
-    <li data-i18n="elig_what_3">Heat pump must be inverter driven or have a minimum SEER2 (Seasonal Energy Efficiency Rating) of 15.2 and a minimum EER2 (Energy Efficiency Ratio) of 12</li>
-  </ul>
-  <p class="elig-h" data-i18n="elig_not_h">What is not eligible:</p>
-  <ul>
-    <li data-i18n="elig_not_1">Any residence outside of Lincoln city limits</li>
-    <li data-i18n="elig_not_2">Commercial property, including multi-family housing</li>
-    <li data-i18n="elig_not_3">Row homes, town homes, condos, and duplexes if the unit is renter occupied</li>
-    <li data-i18n="elig_not_4">Ground source heat pumps</li>
-    <li data-i18n="elig_not_5">New residential construction</li>
-    <li data-i18n="elig_not_6">Mobile homes</li>
-    <li data-i18n="elig_not_7">More than one heat pump per household per City program year (Sept 1-Aug 31)</li>
-    <li data-i18n="elig_not_8">Installation of a new heat pump without replacement of an older system</li>
-  </ul>
-  <p><a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="elig_more">Full program details - City of Lincoln Heat Pump Incentives</a></p>
-</details>
+
 
 <!-- Login -->
 <div class="card" id="login">
-  <label for="pw" data-i18n="pw_label">Contractor password</label>
-  <input id="pw" type="password">
+  <div class="field"><label for="li-email" data-i18n="li_email">Email</label>
+  <input id="li-email" type="email" autocomplete="username"></div>
+  <div class="field"><label for="li-pw" data-i18n="li_pw">Password</label>
+  <input id="li-pw" type="password" autocomplete="current-password"></div>
   <button id="btn-login" data-i18n="btn_login">Log in</button>
   <div class="error" id="err-login"></div>
+  <p class="switch"><span data-i18n="no_account">No account?</span>
+    <a id="to-signup" data-i18n="to_signup">Create one</a></p>
+</div>
+
+<!-- Signup: invite-gated, one account per person, many per company -->
+<div class="card hidden" id="signup">
+  <div class="field"><label for="su-invite" data-i18n="su_invite">Invite code</label>
+  <input id="su-invite" type="text" autocomplete="off">
+  <p class="svy-note" data-i18n="su_invite_note">Provided by the program to participating contractors.</p>
+  <p class="svy-note hidden" id="support-line"><span data-i18n="su_support">Need or forgot your invite code? Email</span> <a id="support-mail" href=""></a></p></div>
+  <div class="field"><label for="su-email" data-i18n="li_email">Email</label>
+  <input id="su-email" type="email" autocomplete="username"></div>
+  <div class="field"><label for="su-pw" data-i18n="su_pw">Password (8+ characters)</label>
+  <input id="su-pw" type="password" autocomplete="new-password"></div>
+  <label for="su-company" data-i18n="su_company">Company</label>
+  <select id="su-company">
+    <option value="" data-i18n="opt_choose">Choose one...</option>
+  </select>
+  <div class="field hidden" id="su-other-wrap">
+    <label for="su-other" data-i18n="su_other">Company name</label>
+    <input id="su-other" type="text">
+    <p class="svy-note" data-i18n="su_other_note">Entries not on the participating list are reviewed by the program.</p>
+  </div>
+  <div id="turnstile-box" style="margin-top:6px"></div>
+  <button id="btn-signup" data-i18n="btn_signup">Create account</button>
+  <div class="error" id="err-signup"></div>
+  <p class="switch"><span data-i18n="have_account">Already have an account?</span>
+    <a id="to-login" data-i18n="btn_login">Log in</a></p>
 </div>
 
 <!-- Lookup -->
@@ -124,18 +170,22 @@
   <div class="error" id="err-lookup"></div>
   <div class="resbox" id="resbox">
     <div id="res-addr" style="font-size:14px;color:var(--muted)"></div>
+    <div class="warn hidden" id="funds-gen"></div>
     <table class="amounts">
-      <tr><td data-i18n="row_les">LES incentive (all LES customers, high-efficiency heat pumps)</td>
+      <tr><td data-i18n="row_les">LES incentive - eligible to all LES customers installing a high-efficiency heat pump</td>
           <td class="amt">$1,000</td></tr>
-      <tr><td data-i18n="row_ac">City incentive - replacing central air conditioner</td>
+      <tr id="row-ac"><td data-i18n="row_ac">City incentive - replacing central air conditioner</td>
           <td class="amt" id="amt-ac"></td></tr>
-      <tr><td data-i18n="row_hp">City incentive - replacing existing heat pump</td>
+      <tr id="row-hp"><td data-i18n="row_hp">City incentive - replacing existing heat pump</td>
           <td class="amt" id="amt-hp"></td></tr>
-      <tr class="total"><td data-i18n="tot_ac">Total (LES + City) - replacing central AC</td>
+      <tr class="total" id="trow-ac"><td data-i18n="tot_ac">Total (LES + City) - replacing central AC</td>
           <td class="amt" id="tot-ac"></td></tr>
-      <tr class="total"><td data-i18n="tot_hp">Total (LES + City) - replacing existing heat pump</td>
+      <tr class="total" id="trow-hp"><td data-i18n="tot_hp">Total (LES + City) - replacing existing heat pump</td>
           <td class="amt" id="tot-hp"></td></tr>
     </table>
+    <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
+    <p class="muted" style="font-size:12px;margin-top:8px" data-i18n="amt_note">* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.</p>
+    <p class="warn hidden" id="funds-lmi" style="margin:8px 0"></p>
     <div class="lmi"><span data-i18n="lmi_note">Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.</span>
       <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_link">How to verify LMI eligibility</a></div>
     <p class="links">
@@ -144,6 +194,48 @@
     </p>
     <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">Multi-family property - eligibility rules may differ. Confirm with the program.</div>
     <div class="warn hidden" id="warn-new" data-i18n="warn_new">Recently created premise - may be new construction, which is not eligible for City incentives.</div>
+    <button id="btn-another" class="secondary" style="margin-top:12px" data-i18n="btn_another">Look up another address</button>
+  </div>
+  <!-- Pre-result survey: required for every lookup. No income
+       questions on this channel - contractors make no assumptions
+       about household income (city instruction). -->
+  <div class="hidden" id="survey" style="margin-top:14px">
+    <p style="font-weight:600;margin-bottom:14px" data-i18n="svy_intro">Please answer a few questions about the existing heating and cooling system.</p>
+    <label for="q-cooling" data-i18n="q_cooling">What cooling equipment does the home have now?</label>
+    <select id="q-cooling">
+      <option value="" data-i18n="opt_choose">Choose one...</option>
+      <option value="central_ac" data-i18n="opt_central_ac">Central air conditioner</option>
+      <option value="heat_pump" data-i18n="opt_heat_pump">Heat pump</option>
+      <option value="window_ac" data-i18n="opt_window_ac">Window AC units only</option>
+      <option value="none" data-i18n="opt_none">No cooling equipment</option>
+      <option value="not_sure" data-i18n="opt_not_sure">Not sure</option>
+    </select>
+    <label for="q-heating" data-i18n="q_heating">Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?</label>
+    <select id="q-heating">
+      <option value="" data-i18n="opt_choose">Choose one...</option>
+      <option value="yes" data-i18n="opt_yes">Yes</option>
+      <option value="no" data-i18n="opt_no">No</option>
+      <option value="not_sure" data-i18n="opt_not_sure">Not sure</option>
+    </select>
+    <label for="q-age" data-i18n="q_age">Approximate age of the system being replaced</label>
+    <select id="q-age">
+      <option value="" data-i18n="opt_choose">Choose one...</option>
+      <option value="<5" data-i18n="opt_lt5">Under 5 years</option>
+      <option value="5-10">5-10</option>
+      <option value="10-15">10-15</option>
+      <option value="15-20">15-20</option>
+      <option value="20+">20+</option>
+      <option value="unknown" data-i18n="opt_unknown">Don't know</option>
+    </select>
+    <label for="q-working" data-i18n="q_working">Is the current system working?</label>
+    <select id="q-working">
+      <option value="" data-i18n="opt_choose">Choose one...</option>
+      <option value="working" data-i18n="opt_working">Working</option>
+      <option value="not_working" data-i18n="opt_not_working">Not working</option>
+      <option value="partially_working" data-i18n="opt_partial">Partially working</option>
+    </select>
+    <button id="btn-survey" data-i18n="btn_survey">Look up rebate amounts</button>
+    <div class="error" id="err-survey"></div>
   </div>
   <p class="muted" id="lookup-note" data-i18n="lookup_note">Select an address from the suggestions to view the customer's eligible incentive amounts.</p>
   <details id="noaddr-details">
@@ -157,11 +249,19 @@
 // ---- Configuration: set these to your Supabase project values ----
 const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
+// Cloudflare Turnstile site key. Leave "" to disable the widget
+// (demo only); set it together with TURNSTILE_SECRET at launch.
+const TURNSTILE_SITE_KEY = "";
+// Support contact for signup problems. Leave "" to hide the line;
+// set once the program domain and mailbox exist.
+const SUPPORT_EMAIL = "";
 // ------------------------------------------------------------------
 
 const API = `${SUPABASE_URL}/functions/v1/portal-api`;
 const RPC = `${SUPABASE_URL}/rest/v1/rpc/search_premises`;
 const LOG = `${SUPABASE_URL}/rest/v1/rpc/log_event`;
+const AUTH = `${SUPABASE_URL}/auth/v1/token?grant_type=password`;
+const COMPANIES = `${SUPABASE_URL}/rest/v1/rpc/list_companies`;
 
 // Session id groups this visit's events for funnel analysis. No cookies,
 // no cross-visit tracking: a new id is generated on every page load.
@@ -179,24 +279,123 @@ function logEvent(etype, meta) {
   }).catch(() => {});
 }
 
-let password = null;
+// Auth session for this visit. Kept in sessionStorage so a page
+// refresh does not log the contractor out; cleared when the tab
+// closes. An expired token fails the next lookup with 401, which
+// routes back to the login screen.
+let accessToken = null;
+try {
+  accessToken = sessionStorage.getItem("hp_contractor_token") || null;
+} catch { /* private-mode storage failures are non-fatal */ }
 let debounce = null;
 let sugRows = [];
 let activeIdx = -1;
+let pendingRow = null;    // address chosen, awaiting survey answers
 const $ = (id) => document.getElementById(id);
 
-// The password is validated server-side on every lookup; the login
-// screen only stores it locally for subsequent requests.
-$("pw").addEventListener("keydown", (ev) => {
+// ---- Account login (Supabase Auth password grant) ----
+$("li-pw").addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") $("btn-login").click();
 });
-
-$("btn-login").addEventListener("click", () => {
-  password = $("pw").value;
-  if (!password) { $("err-login").textContent = STRINGS[lang].err_pw; return; }
+$("btn-login").addEventListener("click", async () => {
+  $("err-login").textContent = "";
+  const email = $("li-email").value.trim();
+  const pw = $("li-pw").value;
+  if (!email || !pw) { $("err-login").textContent = STRINGS[lang].err_login; return; }
+  const r = await fetch(AUTH, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email, password: pw }),
+  });
+  if (!r.ok) { $("err-login").textContent = STRINGS[lang].err_login_bad; return; }
+  const d = await r.json();
+  accessToken = d.access_token;
+  try { sessionStorage.setItem("hp_contractor_token", accessToken); } catch {}
   $("login").classList.add("hidden");
+  $("signup").classList.add("hidden");
   $("lookup").classList.remove("hidden");
   $("q").focus();
+});
+
+// ---- Signup (invite-gated, company from the participating list) ----
+$("to-signup").addEventListener("click", async () => {
+  $("login").classList.add("hidden");
+  $("signup").classList.remove("hidden");
+  // Populate the company dropdown once
+  const sel = $("su-company");
+  if (sel.options.length <= 1) {
+    const r = await fetch(COMPANIES, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+                 Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: "{}",
+    });
+    const companies = r.ok ? await r.json() : [];
+    for (const c of companies) {
+      const o = document.createElement("option");
+      o.value = String(c.company_id); o.textContent = c.name;
+      sel.appendChild(o);
+    }
+    const other = document.createElement("option");
+    other.value = "other"; other.textContent = STRINGS[lang].su_other_option;
+    sel.appendChild(other);
+  }
+});
+$("to-login").addEventListener("click", () => {
+  $("signup").classList.add("hidden");
+  $("login").classList.remove("hidden");
+});
+$("su-company").addEventListener("change", () => {
+  $("su-other-wrap").classList.toggle("hidden", $("su-company").value !== "other");
+});
+
+// Turnstile (invisible/managed): renders only when a site key is set.
+// The token is verified server-side before an account is created.
+let turnstileToken = "";
+window.addEventListener("load", () => {
+  if (!TURNSTILE_SITE_KEY || !window.turnstile) return;
+  turnstile.render("#turnstile-box", {
+    sitekey: TURNSTILE_SITE_KEY,
+    callback: (t) => { turnstileToken = t; },
+    "expired-callback": () => { turnstileToken = ""; },
+  });
+});
+
+$("btn-signup").addEventListener("click", async () => {
+  $("err-signup").textContent = "";
+  const companyVal = $("su-company").value;
+  const payload = {
+    action: "contractor_signup",
+    email: $("su-email").value.trim(),
+    password: $("su-pw").value,
+    invite_code: $("su-invite").value.trim(),
+    company_id: companyVal && companyVal !== "other" ? Number(companyVal) : null,
+    company_other: companyVal === "other" ? $("su-other").value.trim() : "",
+    session_id: SESSION_ID,
+    turnstile_token: turnstileToken,
+  };
+  if (!payload.email || !payload.password || !payload.invite_code ||
+      (!payload.company_id && !payload.company_other)) {
+    $("err-signup").textContent = STRINGS[lang].err_signup_fields; return;
+  }
+  $("btn-signup").disabled = true;
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify(payload),
+  });
+  $("btn-signup").disabled = false;
+  // Turnstile tokens are single-use: refresh after every attempt
+  if (TURNSTILE_SITE_KEY && window.turnstile) { turnstileToken = ""; turnstile.reset(); }
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    $("err-signup").textContent = e.error || "Signup failed."; return;
+  }
+  // Account created: log straight in with the same credentials
+  $("li-email").value = payload.email;
+  $("li-pw").value = payload.password;
+  $("btn-login").click();
 });
 
 function renderSuggestions() {
@@ -215,17 +414,47 @@ function renderSuggestions() {
 function choose(i) {
   const row = sugRows[i];
   clearTimeout(logTimer);
-  logSearch($("q").value.trim(), true);
-  logEvent("select", { rank: i + 1, qlen: $("q").value.trim().length, lang });
+  logSearch($("q").value.trim(), true, row.public_id,
+            null, { rank: i + 1, qlen: $("q").value.trim().length });
   $("q").value = row.display_address;
   $("suggestions").style.display = "none";
   sugRows = []; activeIdx = -1;
-  doLookup(row);
+  // Survey first; the lookup runs on survey submit
+  pendingRow = row;
+  $("survey").classList.remove("hidden");
+  $("lookup-note").style.display = "none";
+  $("err-survey").textContent = "";
 }
+
+$("btn-survey").addEventListener("click", () => {
+  const answers = {
+    cooling_equipment: $("q-cooling").value,
+    heating_also_replaced: $("q-heating").value,
+    is_system_working: $("q-working").value,
+    system_age: $("q-age").value,
+  };
+  if (Object.values(answers).some((v) => !v)) {
+    $("err-survey").textContent = STRINGS[lang].err_survey; return;
+  }
+  $("survey").classList.add("hidden");
+  doLookup(pendingRow, answers);
+});
+
+$("btn-another").addEventListener("click", () => {
+  $("q").value = "";
+  $("resbox").style.display = "none";
+  $("survey").classList.add("hidden");
+  pendingRow = null;
+  $("lookup-note").style.display = "";
+  $("noaddr-details").style.display = "";
+  $("q").focus();
+});
 
 $("q").addEventListener("input", () => {
   clearTimeout(debounce);
   $("resbox").style.display = "none";
+  $("survey").classList.add("hidden");
+  pendingRow = null;
   // Restore the how-to hints when a new lookup begins
   $("lookup-note").style.display = "";
   $("noaddr-details").style.display = "";
@@ -244,19 +473,25 @@ $("q").addEventListener("input", () => {
     renderSuggestions();
     clearTimeout(logTimer);
     const settledQ = q, matched = sugRows.length > 0;
-    logTimer = setTimeout(() => { logSearch(settledQ, matched); }, 1200);
+    const shownIds = sugRows.map((s) => s.public_id);
+    logTimer = setTimeout(() => { logSearch(settledQ, matched, null, shownIds); }, 1200);
   }, 250);
 });
 
+// Settled searches report which premises were suggested (as public
+// ids; the server resolves them). A selection reports the chosen one.
 let logTimer = null;
-function logSearch(q, matched) {
+function logSearch(q, matched, selPubId, shownIds, extraMeta) {
   fetch(LOG, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
                Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-    body: JSON.stringify({ etype: matched ? "search" : "search_no_match",
+    body: JSON.stringify({ etype: selPubId ? "select"
+                             : (matched ? "search" : "search_no_match"),
                            sid: SESSION_ID, qtext: q.toUpperCase(),
-                           meta_in: { page: "contractor", device: DEVICE, lang } }),
+                           pub_ids: shownIds ?? null, sel_pub_id: selPubId ?? null,
+                           meta_in: { page: "contractor", device: DEVICE, lang,
+                                     ...(extraMeta || {}) } }),
   }).catch(() => {});
 }
 
@@ -275,21 +510,23 @@ $("q").addEventListener("keydown", (ev) => {
   }
 });
 
-async function doLookup(row) {
+async function doLookup(row, answers) {
   $("err-lookup").textContent = "";
   const r = await fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
                Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
     body: JSON.stringify({ action: "contractor_lookup",
-                           public_id: row.public_id, password,
-                           session_id: SESSION_ID }),
+                           public_id: row.public_id, access_token: accessToken,
+                           session_id: SESSION_ID, ...answers }),
   });
   if (r.status === 401) {
-    // Wrong password: return to login
+    // Session expired: drop the stored token and return to login
+    accessToken = null;
+    try { sessionStorage.removeItem("hp_contractor_token"); } catch {}
     $("lookup").classList.add("hidden");
     $("login").classList.remove("hidden");
-    $("err-login").textContent = STRINGS[lang].err_pw_bad;
+    $("err-login").textContent = STRINGS[lang].err_session;
     return;
   }
   if (!r.ok) {
@@ -298,18 +535,46 @@ async function doLookup(row) {
     return;
   }
   const d = await r.json();
+  // City amounts arrive from the server for this premise only.
   const LES = 1000;
-  const CITY_AMOUNTS = {
-    Standard: { ac: 750,  hp: 0   },
-    Enhanced: { ac: 1500, hp: 500 },
-  };
   const fmt = (n) => "$" + n.toLocaleString("en-US");
-  const amt = CITY_AMOUNTS[d.tier] || { ac: 0, hp: 0 };
+  const amt = d.city_amounts || { ac: 0, hp: 0 };
   $("res-addr").textContent = d.display_address;
-  $("amt-ac").textContent = fmt(amt.ac);
-  $("amt-hp").textContent = fmt(amt.hp);
-  $("tot-ac").textContent = fmt(LES + amt.ac);
-  $("tot-hp").textContent = fmt(LES + amt.hp);
+  $("amt-ac").textContent = fmt(amt.ac) + "*";
+  $("amt-hp").textContent = fmt(amt.hp) + "*";
+  $("tot-ac").textContent = fmt(LES + amt.ac) + "*";
+  $("tot-hp").textContent = fmt(LES + amt.hp) + "*";
+  // Show only the rows for the reported replacement type; identical
+  // rule across tiers
+  const scen = d.display_scenario || "both";
+  $("row-ac").classList.toggle("hidden", scen === "hp");
+  $("trow-ac").classList.toggle("hidden", scen === "hp");
+  $("row-hp").classList.toggle("hidden", scen === "ac");
+  $("trow-hp").classList.toggle("hidden", scen === "ac");
+  $("warn-window").classList.toggle("hidden", $("q-cooling").value !== "window_ac");
+  // Funds-expended kill switches, mirroring the household page.
+  const funds = d.funds || {};
+  const fmtDate = (iso) => iso
+    ? new Date(iso + "T00:00:00").toLocaleDateString(
+        lang === "es" ? "es-US" : "en-US",
+        { year: "numeric", month: "long", day: "numeric" })
+    : "";
+  const genOut = !!(funds.gen_pop && funds.gen_pop.expended);
+  const lmiOut = !!(funds.lmi && funds.lmi.expended);
+  ["row-ac", "row-hp", "trow-ac", "trow-hp"].forEach((id) => {
+    if (genOut) $(id).classList.add("hidden");
+  });
+  $("funds-gen").classList.toggle("hidden", !genOut);
+  if (genOut) {
+    $("funds-gen").textContent =
+      STRINGS[lang].funds_gen.replace("{date}", fmtDate(funds.gen_pop.date));
+  }
+  $("funds-lmi").classList.toggle("hidden", !lmiOut);
+  if (lmiOut) {
+    $("funds-lmi").textContent =
+      STRINGS[lang].funds_lmi.replace("{date}", fmtDate(funds.lmi.date));
+  }
+  document.querySelector(".lmi").style.display = lmiOut ? "none" : "";
   $("warn-mf").classList.toggle("hidden", !d.flag_multifamily);
   $("warn-new").classList.toggle("hidden", !d.flag_new_construction);
   $("resbox").style.display = "block";
@@ -323,9 +588,9 @@ const STRINGS = {
   en: {
     home:"\u2190 Home",
     demo:"DEMO SYSTEM - results shown are not final",
-    title:"Contractor Portal",
+    title:"Contractor Platform",
     subtitle:"Look up a customer's eligible incentive amounts",
-    row_les:"LES incentive (all LES customers, high-efficiency heat pumps)",
+    row_les:"LES incentive - eligible to all LES customers installing a high-efficiency heat pump",
     row_ac:"City incentive - replacing central air conditioner",
     row_hp:"City incentive - replacing existing heat pump",
     lmi_note:"Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.",
@@ -353,8 +618,50 @@ const STRINGS = {
     elig_more:"Full program details - City of Lincoln Heat Pump Incentives",
     link_les:"LES Sustainable Energy Program",
     link_city:"City Heat Pump Incentives",
-    pw_label:"Contractor password",
     btn_login:"Log in",
+    li_email:"Email",
+    li_pw:"Password",
+    no_account:"No account?",
+    to_signup:"Create one",
+    have_account:"Already have an account?",
+    su_invite:"Invite code",
+    su_invite_note:"Provided by the program to participating contractors.",
+    su_support:"Need or forgot your invite code? Email",
+    su_pw:"Password (8+ characters)",
+    su_company:"Company",
+    su_other:"Company name",
+    su_other_note:"Entries not on the participating list are reviewed by the program.",
+    su_other_option:"Other - enter company name",
+    btn_signup:"Create account",
+    err_login:"Enter your email and password.",
+    err_login_bad:"Invalid email or password.",
+    err_signup_fields:"All fields are required.",
+    err_session:"Session expired. Please log in again.",
+    err_survey:"Please answer all three questions.",
+    svy_intro:"Please answer a few questions about the existing heating and cooling system.",
+    q_working:"Is the current system working?",
+    q_cooling:"What cooling equipment does the home have now?",
+    q_heating:"Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?",
+    q_age:"Approximate age of the system being replaced",
+    opt_choose:"Choose one...",
+    opt_working:"Working",
+    opt_not_working:"Not working",
+    opt_partial:"Partially working",
+    opt_central_ac:"Central air conditioner",
+    opt_heat_pump:"Heat pump",
+    opt_window_ac:"Window AC units only",
+    opt_none:"No cooling equipment",
+    opt_not_sure:"Not sure",
+    opt_yes:"Yes",
+    opt_no:"No",
+    warn_window:"Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.",
+    opt_lt5:"Under 5 years",
+    opt_unknown:"Don't know",
+    btn_survey:"Look up rebate amounts",
+    btn_another:"Look up another address",
+    funds_gen:"City incentives for the general population for this fiscal year have been expended as of {date}. The $1,000 LES incentive is still available to all LES customers installing a high-efficiency heat pump.",
+    funds_lmi:"The $3,000 low- and moderate-income City incentive for this fiscal year has been expended as of {date}.",
+    amt_note:"* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.",
     addr_label:"Customer address",
     warn_mf:"Multi-family property - eligibility rules may differ. Confirm with the program.",
     warn_new:"Recently created premise - may be new construction, which is not eligible for City incentives.",
@@ -362,15 +669,13 @@ const STRINGS = {
     noaddr_summary:"Address not appearing?",
     noaddr_text:"The search covers residential addresses within Lincoln city limits on the program's eligible-service list. If a customer's address does not appear, it may be outside city limits or missing from the list. For assistance, email",
     toggle:"Español (beta)",
-    err_pw:"Enter the password.",
-    err_pw_bad:"Invalid password.",
   },
   es: {
     home:"\u2190 Inicio",
     demo:"SISTEMA DE DEMOSTRACIÓN - los resultados mostrados no son definitivos",
-    title:"Portal de Contratistas",
+    title:"Plataforma de Contratistas",
     subtitle:"Consulte los montos de incentivo elegibles de un cliente",
-    row_les:"Incentivo de LES (todos los clientes de LES, bombas de calor de alta eficiencia)",
+    row_les:"Incentivo de LES - elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia",
     row_ac:"Incentivo de la Ciudad - reemplazo de aire acondicionado central",
     row_hp:"Incentivo de la Ciudad - reemplazo de bomba de calor existente",
     lmi_note:"Los clientes que califiquen por ingresos pueden ser elegibles para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados, el cual reemplaza los montos de la Ciudad indicados arriba. El incentivo de $1,000 de LES aún aplica adicionalmente (total $4,000). Ingreso igual o inferior al 80% del ingreso medio del área de Lincoln; se requiere aprobación antes de la instalación; unidades de alquiler no elegibles.",
@@ -398,8 +703,50 @@ const STRINGS = {
     elig_more:"Detalles completos del programa - Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     link_les:"Programa de Energía Sostenible de LES",
     link_city:"Incentivos de Bomba de Calor de la Ciudad",
-    pw_label:"Contraseña de contratista",
     btn_login:"Iniciar sesión",
+    li_email:"Correo electrónico",
+    li_pw:"Contraseña",
+    no_account:"¿No tiene cuenta?",
+    to_signup:"Crear una",
+    have_account:"¿Ya tiene una cuenta?",
+    su_invite:"Código de invitación",
+    su_invite_note:"Proporcionado por el programa a los contratistas participantes.",
+    su_support:"¿Necesita u olvidó su código de invitación? Escriba a",
+    su_pw:"Contraseña (8+ caracteres)",
+    su_company:"Empresa",
+    su_other:"Nombre de la empresa",
+    su_other_note:"Las entradas que no están en la lista de participantes son revisadas por el programa.",
+    su_other_option:"Otra - ingrese el nombre de la empresa",
+    btn_signup:"Crear cuenta",
+    err_login:"Ingrese su correo y contraseña.",
+    err_login_bad:"Correo o contraseña inválidos.",
+    err_signup_fields:"Todos los campos son obligatorios.",
+    err_session:"La sesión expiró. Inicie sesión de nuevo.",
+    err_survey:"Por favor responda las tres preguntas.",
+    svy_intro:"Por favor responda algunas preguntas sobre el sistema actual de calefacción y enfriamiento.",
+    q_working:"¿Funciona el sistema actual?",
+    q_cooling:"¿Qué equipo de enfriamiento tiene la casa actualmente?",
+    q_heating:"¿También se reemplazará el equipo de calefacción (horno, calefactor de zócalo, caldera, etc.)?",
+    q_age:"Edad aproximada del sistema que se reemplaza",
+    opt_choose:"Elija una opción...",
+    opt_working:"Funciona",
+    opt_not_working:"No funciona",
+    opt_partial:"Funciona parcialmente",
+    opt_central_ac:"Aire acondicionado central",
+    opt_heat_pump:"Bomba de calor",
+    opt_window_ac:"Solo aires acondicionados de ventana",
+    opt_none:"Sin equipo de enfriamiento",
+    opt_not_sure:"No estoy seguro",
+    opt_yes:"Sí",
+    opt_no:"No",
+    warn_window:"El reemplazo de aire de ventana califica cuando la casa no tiene aire acondicionado central. Aplican los montos de reemplazo de AC central mostrados.",
+    opt_lt5:"Menos de 5 años",
+    opt_unknown:"No sé",
+    btn_survey:"Consultar montos de reembolso",
+    btn_another:"Consultar otra dirección",
+    funds_gen:"Los incentivos de la Ciudad para la población general de este año fiscal se han agotado a partir del {date}. El incentivo de $1,000 de LES sigue disponible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia.",
+    funds_lmi:"El incentivo de la Ciudad de $3,000 para ingresos bajos y moderados de este año fiscal se ha agotado a partir del {date}.",
+    amt_note:"* Los montos de la Ciudad están sujetos a las condiciones de elegibilidad del programa, incluidos los requisitos del equipo, el tipo de sistema que se reemplaza y los términos del programa. Vea los detalles de elegibilidad del programa abajo.",
     addr_label:"Dirección del cliente",
     warn_mf:"Propiedad multifamiliar - las reglas de elegibilidad pueden diferir. Confirme con el programa.",
     warn_new:"Propiedad registrada recientemente - puede ser construcción nueva, no elegible para incentivos de la Ciudad.",
@@ -407,10 +754,22 @@ const STRINGS = {
     noaddr_summary:"¿No aparece la dirección?",
     noaddr_text:"La búsqueda cubre direcciones residenciales dentro de los límites de la ciudad de Lincoln en la lista de servicio elegible del programa. Si la dirección de un cliente no aparece, puede estar fuera de los límites de la ciudad o faltar en la lista. Para asistencia, escriba a",
     toggle:"English",
-    err_pw:"Ingrese la contraseña.",
-    err_pw_bad:"Contraseña inválida.",
   },
 };
+// A restored session skips the login screen; a stale token simply
+// 401s on first use and routes back here.
+if (accessToken) {
+  $("login").classList.add("hidden");
+  $("lookup").classList.remove("hidden");
+}
+
+// Support line renders only when a contact is configured
+if (SUPPORT_EMAIL) {
+  $("support-mail").textContent = SUPPORT_EMAIL;
+  $("support-mail").href = "mailto:" + SUPPORT_EMAIL;
+  $("support-line").classList.remove("hidden");
+}
+
 const params = new URLSearchParams(location.search);
 let lang = params.get("lang") === "es" ? "es" : "en";
 function applyLang() {
@@ -424,5 +783,32 @@ $("lang-toggle").onclick = () => { lang = lang === "en" ? "es" : "en"; applyLang
 applyLang();
 logEvent("page_view", { lang });
 </script>
+<details class="elig">
+  <summary data-i18n="elig_summary">Program eligibility details</summary>
+  <p class="elig-h" data-i18n="elig_who_h">Who is eligible:</p>
+  <p data-i18n="elig_who_intro">Residents of the City of Lincoln who:</p>
+  <ul>
+    <li data-i18n="elig_who_1">Live in or own and rent out a single-family detached home (rental units not eligible for the LMI incentive)</li>
+    <li data-i18n="elig_who_2">Live in and own a row home, town home, condo, or duplex</li>
+  </ul>
+  <p class="elig-h" data-i18n="elig_what_h">What is eligible:</p>
+  <ul>
+    <li data-i18n="elig_what_1">The purchase and installation of air source heat pumps or mini-split heat pumps</li>
+    <li data-i18n="elig_what_2">Heat pumps must replace an existing heat pump or central air conditioner that is at least five years old. Window air conditioners are also eligible for replacement with a heat pump when the property has no central air conditioning. A heat pump may be paired with either a gas or electric furnace.</li>
+    <li data-i18n="elig_what_3">Heat pump must be inverter driven or have a minimum SEER2 (Seasonal Energy Efficiency Rating) of 15.2 and a minimum EER2 (Energy Efficiency Ratio) of 12</li>
+  </ul>
+  <p class="elig-h" data-i18n="elig_not_h">What is not eligible:</p>
+  <ul>
+    <li data-i18n="elig_not_1">Any residence outside of Lincoln city limits</li>
+    <li data-i18n="elig_not_2">Commercial property, including multi-family housing</li>
+    <li data-i18n="elig_not_3">Row homes, town homes, condos, and duplexes if the unit is renter occupied</li>
+    <li data-i18n="elig_not_4">Ground source heat pumps</li>
+    <li data-i18n="elig_not_5">New residential construction</li>
+    <li data-i18n="elig_not_6">Mobile homes</li>
+    <li data-i18n="elig_not_7">More than one heat pump per household per City program year (Sept 1-Aug 31)</li>
+    <li data-i18n="elig_not_8">Installation of a new heat pump without replacement of an older system</li>
+  </ul>
+  <p><a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="elig_more">Full program details - City of Lincoln Heat Pump Incentives</a></p>
+</details>
 </body>
 </html>
