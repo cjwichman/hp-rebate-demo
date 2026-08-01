@@ -86,6 +86,12 @@ if (!accessToken || linkType !== "recovery") {
   $("form").classList.remove("hidden");
 }
 
+// Strip the token from the URL immediately after reading it. The
+// fragment is never sent over the network (browsers don't include it
+// in the Referer header), but it would otherwise sit in the address
+// bar and browser history indefinitely.
+history.replaceState(null, "", location.pathname + location.search);
+
 $("btn-save").addEventListener("click", async () => {
   $("err").textContent = "";
   const pw1 = $("pw1").value, pw2 = $("pw2").value;

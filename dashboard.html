@@ -41,6 +41,23 @@
   .error { color:var(--alert); font-size:14px; margin-top:10px; }
   .ok { color:var(--ok); font-size:14px; margin-top:10px; }
   .cp-h { font-family:var(--slab); font-size:18px; color:var(--navy); margin-bottom:16px; }
+  /* Info-icon tooltips on stat cards: plain-language definitions for
+     researchers unfamiliar with the portal's internal terminology. */
+  .info { position:relative; display:inline-flex; margin-left:4px; vertical-align:middle; }
+  .info-i { display:inline-flex; align-items:center; justify-content:center;
+            width:14px; height:14px; border-radius:50%; border:1px solid var(--muted);
+            color:var(--muted); font-size:10px; font-style:italic; font-family:Georgia,serif;
+            cursor:help; line-height:1; }
+  .info-tip { display:none; position:absolute; z-index:20; bottom:130%; left:50%;
+              transform:translateX(-50%); width:min(220px, calc(100vw - 40px));
+              background:var(--navy); color:#fff;
+              font-size:12px; font-weight:400; line-height:1.45; padding:9px 11px;
+              border-radius:8px; text-align:left; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+  .info-tip::after { content:""; position:absolute; top:100%; left:50%;
+                      transform:translateX(-50%); border:5px solid transparent;
+                      border-top-color:var(--navy); }
+  .info:hover .info-tip, .info:focus .info-tip, .info:focus-within .info-tip { display:block; }
+  h2 .info-i, h3 .info-i { font-size:11px; }
   .hidden { display:none; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
   .stat { background:var(--navy-tint); border-radius:10px; padding:14px; text-align:center; }
@@ -130,23 +147,23 @@
   <div class="card">
     <h2>Household site activity (search &rarr; verify &rarr; view)</h2>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-sessions">-</div><div class="l">Unique visits (sessions)</div></div>
-      <div class="stat"><div class="n" id="s-selections">-</div><div class="l">Addresses selected</div></div>
-      <div class="stat"><div class="n" id="s-searches">-</div><div class="l">Address searches run</div></div>
-      <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">Searches with no eligible match</div></div>
-      <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Verification codes requested</div></div>
-      <div class="stat"><div class="n" id="s-reveals">-</div><div class="l">Rebate results viewed</div></div>
+      <div class="stat"><div class="n" id="s-sessions">-</div><div class="l">Unique visits (sessions)<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">A new session starts each time the household site loads. No login is required, so one person can create several sessions.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-selections">-</div><div class="l">Addresses selected<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a visitor picked an address from the search suggestions.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-searches">-</div><div class="l">Address searches run<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a visitor typed a search query, whether or not they picked a result.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">Searches with no eligible match<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Searches where nothing in the study address list matched what was typed.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Verification codes requested<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a visitor submitted an email to receive a verification code.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-reveals">-</div><div class="l">Rebate results viewed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a household verified a code and saw its rebate amounts. The core household outcome.</span></span></div></div>
     </div>
   </div>
 
   <div class="card">
     <h2>Rebate results viewed, by assignment</h2>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard rebate viewed</div></div>
-      <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced rebate viewed</div></div>
-      <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor rebate lookups</div></div>
-      <div class="stat"><div class="n" id="s-multi">-</div><div class="l">Emails viewing 2+ addresses</div></div>
-      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed verification codes</div></div>
+      <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard rebate viewed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Reveals for addresses randomized to the Standard (lower) rebate arm.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced rebate viewed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Reveals for addresses randomized to the Enhanced (higher) rebate arm.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor rebate lookups<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a logged-in contractor looked up a customer's address and saw the amounts.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-multi">-</div><div class="l">Emails viewing 2+ addresses<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Distinct emails that revealed more than one address, such as a household checking their own home and a relative's.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed verification codes<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a household entered a code that did not match or had expired.</span></span></div></div>
     </div>
   </div>
 
@@ -154,10 +171,10 @@
     <h2>Premise coverage</h2>
     <p class="muted">Repeat reveals per premise, and premises surfaced in searches that never reached a reveal or contractor lookup.</p>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-prem-revealed">-</div><div class="l">Premises revealed</div></div>
-      <div class="stat"><div class="n" id="s-prem-repeat">-</div><div class="l">Premises revealed 2+ times</div></div>
-      <div class="stat"><div class="n" id="s-sugg-never">-</div><div class="l">Suggested, never revealed</div></div>
-      <div class="stat"><div class="n" id="s-sel-never">-</div><div class="l">Selected, never revealed</div></div>
+      <div class="stat"><div class="n" id="s-prem-revealed">-</div><div class="l">Premises revealed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Distinct addresses revealed at least once, by a household or a contractor.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-prem-repeat">-</div><div class="l">Premises revealed 2+ times<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Addresses revealed more than once. Includes refreshes and a contractor looking up an address a household already checked.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-sugg-never">-</div><div class="l">Suggested, never revealed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Addresses that appeared in search suggestions but were never selected and verified.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-sel-never">-</div><div class="l">Selected, never revealed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Addresses a visitor selected but never finished verifying, such as abandoning before entering a code.</span></span></div></div>
     </div>
   </div>
 
@@ -177,9 +194,9 @@
   <div class="card">
     <h2>LMI screener and information requests (household)</h2>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-scr-takes">-</div><div class="l">Screener uses</div></div>
-      <div class="stat"><div class="n" id="s-scr-rate">-</div><div class="l">Take rate (per reveal)</div></div>
-      <div class="stat"><div class="n" id="s-scr-likely">-</div><div class="l">Likely-LMI share of takers</div></div>
+      <div class="stat"><div class="n" id="s-scr-takes">-</div><div class="l">Screener uses<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a household answered the optional household-size and income questions in the survey.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-scr-rate">-</div><div class="l">Take rate (per reveal)<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Screener uses divided by total reveals. Share of households who answered the optional income questions.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-scr-likely">-</div><div class="l">Likely-LMI share of takers<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Among households who used the screener, the share whose answers placed them at or below the 80% AMI threshold.</span></span></div></div>
     </div>
     <h3>Info requests by tier</h3>
     <table id="info-tier"><thead><tr><th>Tier</th><th class="num">Yes</th><th class="num">No</th><th class="num">Yes rate</th></tr></thead><tbody></tbody></table>
@@ -194,7 +211,7 @@
     <h2>Contractor accounts</h2>
     <p class="muted">Lookup volume per account and per company. Accounts above the alert threshold are highlighted.</p>
     <div class="grid" style="margin-bottom:8px">
-      <div class="stat" id="wrap-highvol"><div class="n" id="s-highvol">-</div><div class="l">Accounts over threshold (<span id="s-threshold">-</span>)</div></div>
+      <div class="stat" id="wrap-highvol"><div class="n" id="s-highvol">-</div><div class="l">Accounts over threshold (<span id="s-threshold">-</span>)<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Contractor accounts with more lookups than the configured alert threshold. For monitoring only, not necessarily a problem.</span></span></div></div>
     </div>
     <h3>By company</h3>
     <table id="by-company"><thead><tr><th>Company</th><th class="num">Lookups</th></tr></thead><tbody></tbody></table>
@@ -207,9 +224,9 @@
   <div class="card">
     <h2>Abuse protection</h2>
     <div class="grid">
-      <div class="stat"><div class="n" id="s-ratelim">-</div><div class="l">Rate-limit rejections</div></div>
-      <div class="stat"><div class="n" id="s-turnstile">-</div><div class="l">Turnstile rejections</div></div>
-      <div class="stat"><div class="n" id="s-surej">-</div><div class="l">Signup rejections</div></div>
+      <div class="stat"><div class="n" id="s-ratelim">-</div><div class="l">Rate-limit rejections<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Requests blocked for exceeding the hourly limits on code requests or reveals.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-turnstile">-</div><div class="l">Turnstile rejections<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Requests blocked by the Cloudflare bot-check.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-surej">-</div><div class="l">Signup rejections<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Contractor or dashboard signup attempts blocked, usually for an invalid or expired invite code.</span></span></div></div>
     </div>
   </div>
 
@@ -394,12 +411,30 @@ async function loadStats(token) {
       }).join("")
     : '<p class="muted">No rebate results viewed yet.</p>';
 
-  // Survey distributions: one table per question, columns per response
+  // Survey distributions: one table per question, columns per response.
+  // Keys must match SURVEY_QS in the edge function - the two are easy
+  // to let drift apart when the survey questions change, as happened
+  // once already (replacing_what was replaced by the two questions
+  // below in patches 5/7, but this list was never updated to match).
   const QLABEL = {
+    cooling_equipment: "What cooling equipment does the home have now?",
+    heating_also_replaced: "Is the heating equipment also being replaced?",
     is_system_working: "Is the current system working?",
-    replacing_what: "What is being replaced?",
     system_age: "System age",
     lmi_perceived: "Perceived income-tier qualification (household only)",
+  };
+  // Plain-language column headers, matching the wording households and
+  // contractors actually see in the survey - raw values like
+  // "central_ac" or "not_sure" are the stored codes, not what to show.
+  const VALLABEL = {
+    cooling_equipment: { central_ac: "Central AC", heat_pump: "Heat pump",
+      window_ac: "Window AC", none: "None", not_sure: "Not sure" },
+    heating_also_replaced: { yes: "Yes", no: "No", not_sure: "Not sure" },
+    is_system_working: { working: "Working", not_working: "Not working",
+      partially_working: "Partially working" },
+    lmi_perceived: { yes: "Yes", no: "No", not_sure: "Not sure" },
+    system_age: { "<5": "Under 5 yrs", "5-10": "5-10 yrs", "10-15": "10-15 yrs",
+      "15-20": "15-20 yrs", "20+": "20+ yrs", unknown: "Unknown" },
   };
   const dists = d.survey_distributions || {};
   $("survey-dists").innerHTML = Object.keys(QLABEL).map((q) => {
@@ -409,6 +444,7 @@ async function loadStats(token) {
     for (const grp of Object.values(dist.by_channel)) Object.keys(grp).forEach((v) => vals.add(v));
     for (const grp of Object.values(dist.by_tier)) Object.keys(grp).forEach((v) => vals.add(v));
     const cols = [...vals].sort();
+    const colLabel = (c) => (VALLABEL[q] && VALLABEL[q][c]) || c;
     const row = (label, grp) =>
       `<tr><td>${label}</td>` +
       cols.map((c) => `<td class="num">${grp?.[c] ?? 0}</td>`).join("") + "</tr>";
@@ -418,7 +454,7 @@ async function loadStats(token) {
     ];
     if (!cols.length) return "";
     return `<h3>${QLABEL[q]}</h3>
-      <table><thead><tr><th></th>${cols.map((c) => `<th class="num">${c}</th>`).join("")}</tr></thead>
+      <table><thead><tr><th></th>${cols.map((c) => `<th class="num">${colLabel(c)}</th>`).join("")}</tr></thead>
       <tbody>${groups.join("")}</tbody></table>`;
   }).join("") || '<p class="muted">No survey responses yet.</p>';
 
