@@ -669,8 +669,8 @@ async function doLookup(row, answers) {
   $("amt-hp").textContent = fmt(amt.hp) + "*";
   $("tot-ac").textContent = fmt(LES + amt.ac) + "*";
   $("tot-hp").textContent = fmt(LES + amt.hp) + "*";
-  // Show only the rows for the reported replacement type; identical
-  // rule across tiers
+  // Show only the rows for the reported replacement type; this rule
+  // is the same regardless of the dollar amounts
   const scen = d.display_scenario || "both";
   $("row-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
   $("trow-ac").classList.toggle("hidden", scen === "hp" || scen === "none");

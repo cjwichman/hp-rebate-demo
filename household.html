@@ -262,10 +262,9 @@
   <div class="warn hidden" id="warn-none" data-i18n="warn_none">The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Contact the program to confirm.</div>
   <p class="footnote" data-i18n="amt_note">* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.</p>
 
-  <!-- LMI callout. IDENTICAL across Standard and Enhanced tiers by
-       construction: nothing in this block reads the tier, and no
-       content here may change during the study period without
-       flagging it - mid-study display changes contaminate outcomes. -->
+  <!-- LMI callout: keep this wording identical regardless of the
+       dollar amounts shown above. Anything added here must not vary
+       by premise or change over time without deliberate review. -->
   <div class="lmi-callout">
     <div class="lmi-h" data-i18n="lmi_head">Income-qualified households: up to $4,000*</div>
     <p class="warn hidden" id="funds-lmi" style="margin:0 0 10px"></p>
@@ -575,8 +574,8 @@ function showResult(d, cooling) {
   $("tot-hp").textContent = fmt(LES + amt.hp) + "*";
   $("result-addr").textContent = d.display_address;
   // Show only the amount rows for the reported replacement type
-  // (server-derived; "both" when the type is not_sure). The rule is
-  // identical across tiers, so tier-blindness of the layout holds.
+  // (server-derived; "both" when the type is not_sure). This rule is
+  // the same for every household, regardless of the dollar amounts.
   const scen = d.display_scenario || "both";
   $("row-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
   $("trow-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
