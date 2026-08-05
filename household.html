@@ -126,6 +126,12 @@
              font-weight:600; font-size:14px;
              transition:background .15s, color .15s; }
   .linkbtn:hover { background:var(--navy); color:#fff; }
+  .partner-footer { background:var(--navy); border-radius:14px; padding:18px 22px;
+                    margin-top:28px; text-align:center; }
+  .partner-footer p { color:#cdd9e2; font-size:12.5px; margin:0 0 12px; }
+  .partner-logos { display:flex; align-items:center; justify-content:center; gap:26px; }
+  .logo-lincoln { height:44px; width:auto; }
+  .logo-les { height:22px; width:auto; }
 </style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
@@ -282,6 +288,15 @@
   <div class="warn hidden" id="warn-new" data-i18n="warn_new">This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.</div>
   <button id="btn-another" class="secondary" data-i18n="btn_another">Look up another address</button>
 </div>
+
+
+<footer class="partner-footer">
+  <p data-i18n="partners">A partnership of the City of Lincoln and Lincoln Electric System</p>
+  <div class="partner-logos">
+    <img src="lincoln-logo.png" alt="City of Lincoln" class="logo-lincoln">
+    <img src="les-logo.png" alt="Lincoln Electric System" class="logo-les">
+  </div>
+</footer>
 
 <script>
 // ---- Configuration: set these to your Supabase project values ----
@@ -677,6 +692,7 @@ const STRINGS = {
   en: {
     home:"\u2190 Home",
     demo:"DEMO SYSTEM - incentive amounts are not final",
+    partners:"A partnership of the City of Lincoln and Lincoln Electric System",
     title:"City of Lincoln Heat Pump Rebate",
     subtitle:"Enter your address to see your eligible incentive amounts",
     addr_label:"Enter your address",
@@ -763,6 +779,7 @@ const STRINGS = {
   es: {
     home:"\u2190 Inicio",
     demo:"SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
+    partners:"Una colaboración de la Ciudad de Lincoln y Lincoln Electric System",
     title:"Reembolso de Bomba de Calor de la Ciudad de Lincoln",
     subtitle:"Ingrese su dirección para ver los montos de incentivo elegibles",
     addr_label:"Ingrese su dirección",

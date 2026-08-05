@@ -109,6 +109,12 @@
   .lmi { background:#fdfaf2; border:1px solid var(--gold-line);
          border-left:4px solid var(--gold); color:var(--navy); border-radius:9px;
          padding:10px 14px; font-size:13px; margin-top:12px; text-align:left; }
+  .partner-footer { background:var(--navy); border-radius:14px; padding:18px 22px;
+                    margin-top:28px; text-align:center; }
+  .partner-footer p { color:#cdd9e2; font-size:12.5px; margin:0 0 12px; }
+  .partner-logos { display:flex; align-items:center; justify-content:center; gap:26px; }
+  .logo-lincoln { height:44px; width:auto; }
+  .logo-les { height:22px; width:auto; }
 </style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
@@ -278,6 +284,15 @@
     <a href="mailto:SEP@les.com">SEP@les.com</a>.</p>
   </details>
 </div>
+
+
+<footer class="partner-footer">
+  <p data-i18n="partners">A partnership of the City of Lincoln and Lincoln Electric System</p>
+  <div class="partner-logos">
+    <img src="lincoln-logo.png" alt="City of Lincoln" class="logo-lincoln">
+    <img src="les-logo.png" alt="Lincoln Electric System" class="logo-les">
+  </div>
+</footer>
 
 <script>
 // ---- Configuration: set these to your Supabase project values ----
@@ -714,6 +729,7 @@ const STRINGS = {
   en: {
     home:"\u2190 Home",
     demo:"DEMO SYSTEM - incentive amounts are not final",
+    partners:"A partnership of the City of Lincoln and Lincoln Electric System",
     title:"Contractor Platform",
     subtitle:"Look up a customer's eligible incentive amounts",
     row_les:"LES incentive - eligible to all LES customers installing a high-efficiency heat pump",
@@ -812,6 +828,7 @@ const STRINGS = {
   es: {
     home:"\u2190 Inicio",
     demo:"SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
+    partners:"Una colaboración de la Ciudad de Lincoln y Lincoln Electric System",
     title:"Plataforma de Contratistas",
     subtitle:"Consulte los montos de incentivo elegibles de un cliente",
     row_les:"Incentivo de LES - elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia",
