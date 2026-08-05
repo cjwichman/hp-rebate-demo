@@ -186,7 +186,7 @@
 
 <!-- Pre-reveal survey: required, asked before any result is shown -->
 <div class="card hidden" id="step-survey">
-  <p style="font-weight:600;margin-bottom:14px" data-i18n="svy_intro">Please answer a few questions about the existing heating and cooling system.</p>
+  <p style="font-weight:600;margin-bottom:14px" data-i18n="svy_intro">Please answer a few questions about the property's existing heating and cooling system.</p>
   <label for="q-cooling" data-i18n="q_cooling">What cooling equipment does the home have now?</label>
   <select id="q-cooling">
     <option value="" data-i18n="opt_choose" style="color:var(--ink)">Choose one...</option>
@@ -654,10 +654,14 @@ $("btn-another").addEventListener("click", () => {
 
 // Restore a cached reveal after a refresh. Restored views are logged
 // as page_view with restored:true, not as reveal events: no fresh
-// verification occurred.
+// verification occurred. Restoration applies only to reload and
+// back/forward navigations - arriving via a link or typed URL starts
+// fresh, so the cache never carries across pages within the tab.
 let restoredView = false;
 try {
-  const cached = sessionStorage.getItem("hp_reveal");
+  const navType = performance.getEntriesByType("navigation")[0]?.type;
+  const cached = (navType === "reload" || navType === "back_forward")
+    ? sessionStorage.getItem("hp_reveal") : null;
   if (cached) {
     const { d, public_id, cooling } = JSON.parse(cached);
     if (d && public_id) {
@@ -732,7 +736,7 @@ const STRINGS = {
     err_code:"Enter the 6-digit code.",
     err_survey:"Please answer all questions.",
     loading:"Verifying...",
-    svy_intro:"Please answer a few questions about the existing heating and cooling system.",
+    svy_intro:"Please answer a few questions about the property's existing heating and cooling system.",
     q_working:"Is the current system working?",
     q_cooling:"What cooling equipment does the home have now?",
     q_heating:"Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?",
@@ -819,7 +823,7 @@ const STRINGS = {
     err_code:"Ingrese el código de 6 dígitos.",
     err_survey:"Por favor responda todas las preguntas.",
     loading:"Verificando...",
-    svy_intro:"Por favor responda algunas preguntas sobre el sistema actual de calefacción y enfriamiento.",
+    svy_intro:"Por favor responda algunas preguntas sobre el sistema actual de calefacción y enfriamiento de la propiedad.",
     q_working:"¿Funciona el sistema actual?",
     q_cooling:"¿Qué equipo de enfriamiento tiene la casa actualmente?",
     q_heating:"¿También se reemplazará el equipo de calefacción (horno, calefactor de zócalo, caldera, etc.)?",

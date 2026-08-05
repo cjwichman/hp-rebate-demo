@@ -572,10 +572,19 @@ $("btn-survey").addEventListener("click", () => {
   doLookup(pendingRow, answers);
 });
 
+// Survey answers describe one specific address - clear them any
+// time a new lookup begins so responses never carry over.
+function clearSurvey() {
+  ["q-cooling", "q-heating", "q-age", "q-working"].forEach(
+    (id) => { $(id).value = ""; });
+  $("err-survey").textContent = "";
+}
+
 $("btn-another").addEventListener("click", () => {
   $("q").value = "";
   $("resbox").style.display = "none";
   $("survey").classList.add("hidden");
+  clearSurvey();
   pendingRow = null;
   $("lookup-note").style.display = "";
   $("noaddr-details").style.display = "";
@@ -586,6 +595,7 @@ $("q").addEventListener("input", () => {
   clearTimeout(debounce);
   $("resbox").style.display = "none";
   $("survey").classList.add("hidden");
+  clearSurvey();
   pendingRow = null;
   // Restore the how-to hints when a new lookup begins
   $("lookup-note").style.display = "";
