@@ -435,8 +435,8 @@ async function loadStats(token) {
     is_system_working: { working: "Working", not_working: "Not working",
       partially_working: "Partially working" },
     lmi_perceived: { yes: "Yes", no: "No", not_sure: "Not sure" },
-    system_age: { "<5": "Under 5 yrs", "5-10": "5-10 yrs", "10-15": "10-15 yrs",
-      "15-20": "15-20 yrs", "20+": "20+ yrs", unknown: "Unknown" },
+    system_age: { "0-4": "0-4 yrs", "5-9": "5-9 yrs", "10-14": "10-14 yrs",
+      "15-19": "15-19 yrs", "20+": "20+ yrs", unknown: "Unknown" },
   };
   // Column order matches the order options appear in the actual
   // survey (SURVEY_SETS in the edge function), not alphabetical -
@@ -446,7 +446,7 @@ async function loadStats(token) {
     cooling_equipment: ["central_ac", "heat_pump", "window_ac", "none", "not_sure"],
     heating_also_replaced: ["yes", "no", "not_sure"],
     is_system_working: ["working", "not_working", "partially_working"],
-    system_age: ["<5", "5-10", "10-15", "15-20", "20+", "unknown"],
+    system_age: ["0-4", "5-9", "10-14", "15-19", "20+", "unknown"],
     lmi_perceived: ["yes", "no", "not_sure"],
   };
   const dists = d.survey_distributions || {};

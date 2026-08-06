@@ -85,6 +85,8 @@
   table.amounts tr.total td:last-child { border-radius:0 0 8px 0; }
   table.amounts tr.total td.amt { font-size:18px; color:var(--navy); }
   .footnote { font-size:12px; color:var(--muted); text-align:left; margin-top:10px; }
+  .rl { display:block; font-weight:600; }
+  .rd { display:block; font-size:12.5px; color:var(--muted); }
   .topbar { display:flex; justify-content:space-between; align-items:center;
             font-size:14px; margin-bottom:12px; }
   .topbar a { color:var(--navy); text-decoration:none; cursor:pointer; }
@@ -144,13 +146,17 @@
 <div class="demo-banner" data-i18n="demo">DEMO SYSTEM - incentive amounts are not final</div>
 
 <h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
-<p class="sub" data-i18n="subtitle">Enter your address to see your eligible rebate amount</p>
+<p class="sub" id="subtitle" data-i18n="subtitle">Enter your address to see your eligible rebate amount</p>
 
 <!-- Eligibility details (exact City of Lincoln program language) -->
 
 
 <!-- Step 1: address search -->
 <div class="card" id="step-address">
+  <div class="lmi hidden" id="wb-banner" style="margin:0 0 14px">
+    <span data-i18n="wb_text">Welcome back. You can view your saved incentive amounts without a new code.</span>
+    <p style="margin-top:8px"><a id="wb-btn" class="linkbtn" data-i18n="wb_btn">View saved amounts</a></p>
+  </div>
   <label for="q" data-i18n="addr_label">Enter your address</label>
   <input id="q" type="text" autocomplete="off" placeholder="e.g. 9549 Hollow Tree Pl">
   <div id="suggestions" role="listbox"></div>
@@ -206,10 +212,10 @@
   <label for="q-age" data-i18n="q_age">Approximate age of the system being replaced</label>
   <select id="q-age">
     <option value="" data-i18n="opt_choose" style="color:var(--ink)">Choose one...</option>
-    <option value="<5" data-i18n="opt_lt5">Under 5 years</option>
-    <option value="5-10">5-10</option>
-    <option value="10-15">10-15</option>
-    <option value="15-20">15-20</option>
+    <option value="0-4">0-4</option>
+    <option value="5-9">5-9</option>
+    <option value="10-14">10-14</option>
+    <option value="15-19">15-19</option>
     <option value="20+">20+</option>
     <option value="unknown" data-i18n="opt_unknown">Don't know</option>
   </select>
@@ -252,16 +258,22 @@
   <p data-i18n="result_intro">Your household's eligible incentive amounts:</p>
   <div class="addr" id="result-addr"></div>
   <div class="warn hidden" id="funds-gen"></div>
-  <table class="amounts">
-    <tr><td data-i18n="row_les">LES incentive - eligible to all LES customers installing a high-efficiency heat pump</td>
+  <div id="lmi-slot-top"></div>
+  <table class="amounts" id="amt-table">
+    <tr><td><span class="rl" data-i18n="row_les_t">LES incentive</span>
+        <span class="rd" data-i18n="row_les_d">Eligible to all LES customers installing a high-efficiency heat pump</span></td>
         <td class="amt">$1,000</td></tr>
-    <tr id="row-ac"><td data-i18n="row_ac">City of Lincoln incentive - heat pump replacing a central air conditioner</td>
+    <tr id="row-ac"><td><span class="rl" data-i18n="row_city_t">City of Lincoln incentive</span>
+        <span class="rd" data-i18n="row_ac_d">Heat pump replacing a central air conditioner</span></td>
         <td class="amt" id="amt-ac"></td></tr>
-    <tr id="row-hp"><td data-i18n="row_hp">City of Lincoln incentive - heat pump replacing an existing heat pump</td>
+    <tr id="row-hp"><td><span class="rl" data-i18n="row_city_t">City of Lincoln incentive</span>
+        <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
         <td class="amt" id="amt-hp"></td></tr>
-    <tr class="total" id="trow-ac"><td data-i18n="tot_ac">Total (LES + City) - replacing a central air conditioner</td>
+    <tr class="total" id="trow-ac"><td><span class="rl" data-i18n="tot_t">Total (LES + City)</span>
+        <span class="rd" data-i18n="row_ac_d">Heat pump replacing a central air conditioner</span></td>
         <td class="amt" id="tot-ac"></td></tr>
-    <tr class="total" id="trow-hp"><td data-i18n="tot_hp">Total (LES + City) - replacing an existing heat pump</td>
+    <tr class="total" id="trow-hp"><td><span class="rl" data-i18n="tot_t">Total (LES + City)</span>
+        <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
         <td class="amt" id="tot-hp"></td></tr>
   </table>
   <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
@@ -271,16 +283,34 @@
   <!-- LMI callout: keep this wording identical regardless of the
        dollar amounts shown above. Anything added here must not vary
        by premise or change over time without deliberate review. -->
-  <div class="lmi-callout">
+  <div class="lmi-callout" id="lmi-box">
     <div class="lmi-h" data-i18n="lmi_head">Income-qualified households: up to $4,000*</div>
     <p class="warn hidden" id="funds-lmi" style="margin:0 0 10px"></p>
     <p class="hidden" id="lmi-likely" data-i18n="lmi_likely">Based on your answers, your household may qualify for the income-qualified incentive: $3,000 from the City plus the $1,000 LES incentive, $4,000 total. The standard amounts above apply if income is not verified.</p>
     <p id="lmi-generic" data-i18n="lmi_generic">Low- and moderate-income households (income at or below 80% of the Lincoln Area Median Income) may be eligible for larger incentives.</p>
 
+    <!-- Post-reveal income screener: shown only when the optional
+         screener was skipped in the survey. Submits through the same
+         lmi_screener action as before; adds no code machinery. -->
+    <div id="addinc-wrap" class="hidden">
+      <p style="margin-top:10px"><a id="addinc-link" class="linkbtn" data-i18n="ai_link">Add income information</a></p>
+      <div id="addinc-form" class="screener hidden">
+        <label for="ai-size" data-i18n="q_size">Household size (optional)</label>
+        <select id="ai-size"><option value=""></option>
+          <option>1</option><option>2</option><option>3</option><option>4</option>
+          <option>5</option><option>6</option><option>7</option><option>8</option>
+        </select>
+        <label for="ai-income" data-i18n="q_income">Annual household income (optional)</label>
+        <select id="ai-income" disabled></select>
+        <button id="ai-submit" data-i18n="ai_btn">Submit</button>
+        <div class="error" id="ai-err"></div>
+      </div>
+      <p class="scr-result hidden" id="ai-done" data-i18n="ai_done">Thank you - your answers have been recorded.</p>
+    </div>
     <p style="margin-top:12px">
       <a id="lmi-learn" class="linkbtn" href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_learn">Learn more about income verification</a></p>
   </div>
-  <p class="links">
+  <p class="links" id="result-links">
     <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
     <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="link_city">City of Lincoln Heat Pump Incentives</a>
   </p>
@@ -342,6 +372,16 @@ function renderSuggestions() {
   });
   box.style.display = sugRows.length ? "block" : "none";
 }
+
+// Dismiss the suggestion list on an outside click or Escape. A
+// pasted address otherwise leaves the list open over the page.
+document.addEventListener("mousedown", (ev) => {
+  if (ev.target.closest("#suggestions") || ev.target === $("q")) return;
+  $("suggestions").style.display = "none";
+});
+$("q").addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") $("suggestions").style.display = "none";
+});
 
 function choose(i) {
   selected = sugRows[i];
@@ -560,6 +600,21 @@ $("btn-survey").addEventListener("click", async () => {
       cooling: $("q-cooling").value,
     }));
   } catch { /* private-mode storage failures are non-fatal */ }
+  // Saved-view token: lets this browser re-display these amounts on
+  // a later visit without a new email code. Holds no amounts, no
+  // email, and no survey answers - only the address reference, the
+  // signed token, and what is needed to rebuild the display.
+  try {
+    if (d.return_token) {
+      localStorage.setItem("hp_saved", JSON.stringify({
+        public_id: selected.public_id,
+        exp: d.return_token.exp, mac: d.return_token.mac,
+        display_scenario: d.display_scenario,
+        cooling: $("q-cooling").value,
+        likely_lmi: d.likely_lmi, screener_given: d.screener_given,
+      }));
+    }
+  } catch { /* non-fatal */ }
   showResult(d, $("q-cooling").value);
 });
 
@@ -589,6 +644,10 @@ function showResult(d, cooling) {
   $("trow-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
   $("row-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
   $("trow-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
+  // A $0 City amount is not shown: the row and its total are omitted
+  // and only the LES incentive appears for that scenario.
+  if (amt.ac === 0) { $("row-ac").classList.add("hidden"); $("trow-ac").classList.add("hidden"); }
+  if (amt.hp === 0) { $("row-hp").classList.add("hidden"); $("trow-hp").classList.add("hidden"); }
   if (cooling === "window_ac") show("warn-window");
   if (scen === "none") show("warn-none");
   if (d.flag_multifamily) show("warn-mf");
@@ -598,6 +657,17 @@ function showResult(d, cooling) {
   // (computed server-side). The generic message is the default.
   $("lmi-likely").classList.toggle("hidden", !d.likely_lmi);
   $("lmi-generic").classList.toggle("hidden", !!d.likely_lmi);
+  // Likely-LMI households see the callout above the amounts table;
+  // everyone else sees it in its default position below.
+  if (d.likely_lmi) $("lmi-slot-top").appendChild($("lmi-box"));
+  else $("step-result").insertBefore($("lmi-box"), $("result-links"));
+  // Offer the post-reveal screener only when the optional screener
+  // was skipped during the survey.
+  $("addinc-wrap").classList.toggle("hidden", !!d.screener_given);
+  $("addinc-form").classList.add("hidden");
+  $("ai-done").classList.add("hidden");
+  if (Array.isArray(d.lmi_brackets)) lmiLimits = d.lmi_brackets;
+  hide("subtitle");
   // Funds-expended kill switches. City rows disappear when the
   // general-population funds are expended (the LES row remains);
   // the LMI callout collapses to a notice when LMI funds are
@@ -624,6 +694,7 @@ function showResult(d, cooling) {
       STRINGS[lang].funds_lmi.replace("{date}", fmtDate(funds.lmi.date));
     $("lmi-likely").classList.add("hidden");
     $("lmi-generic").classList.add("hidden");
+    $("addinc-wrap").classList.add("hidden");
   }
   hide("step-address"); hide("step-email"); hide("step-code");
   hide("step-survey");
@@ -649,6 +720,9 @@ $("btn-another").addEventListener("click", () => {
   hide("step-result"); hide("step-email"); hide("step-code");
   hide("step-survey");
   show("step-address");
+  show("subtitle");
+  $("ai-size").value = ""; $("ai-income").innerHTML = "";
+  $("ai-income").disabled = true; $("ai-err").textContent = "";
   $("q").focus();
 });
 
@@ -671,6 +745,112 @@ try {
     }
   }
 } catch { /* corrupt cache: fall through to the normal flow */ }
+
+// ---- Saved-view return path ----
+// A prior reveal in this browser left a signed token; offer to
+// re-display those amounts without a new code. The server verifies
+// the token and recomputes amounts and funds flags.
+let savedView = null;
+try {
+  if (!restoredView) {
+    const s = JSON.parse(localStorage.getItem("hp_saved") || "null");
+    if (s && s.mac && s.exp > Date.now() / 1000) {
+      savedView = s;
+      show("wb-banner");
+    } else if (s) {
+      localStorage.removeItem("hp_saved");
+    }
+  }
+} catch { /* non-fatal */ }
+
+$("wb-btn").addEventListener("click", async () => {
+  if (!savedView) return;
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "token_reveal",
+                           public_id: savedView.public_id,
+                           exp: savedView.exp, mac: savedView.mac,
+                           session_id: SESSION_ID }),
+  });
+  if (!r.ok) {
+    try { localStorage.removeItem("hp_saved"); } catch {}
+    hide("wb-banner"); savedView = null;
+    return;
+  }
+  const d = await r.json();
+  d.display_scenario = savedView.display_scenario;
+  d.likely_lmi = savedView.likely_lmi;
+  d.screener_given = savedView.screener_given;
+  selected = { public_id: savedView.public_id,
+               display_address: d.display_address };
+  hide("wb-banner");
+  showResult(d, savedView.cooling);
+});
+
+// ---- Post-reveal income screener ----
+$("addinc-link").addEventListener("click", () => {
+  $("addinc-form").classList.remove("hidden");
+});
+$("ai-size").addEventListener("change", () => {
+  const size = Number($("ai-size").value);
+  const inc = $("ai-income");
+  inc.innerHTML = "";
+  const row = lmiLimits.find((r) => r.hh_size === size);
+  if (!row) { inc.disabled = true; return; }
+  const fmt = (n) => "$" + Number(n).toLocaleString("en-US");
+  const labels = [
+    `${STRINGS[lang].scr_under} ${fmt(row.b1)}`,
+    `${fmt(row.b1)} - ${fmt(row.b2)}`,
+    `${fmt(row.b2)} - ${fmt(row.b3)}`,
+    `${STRINGS[lang].scr_over} ${fmt(row.b3)}`,
+  ];
+  inc.appendChild(document.createElement("option")).value = "";
+  labels.forEach((label, i) => {
+    const o = document.createElement("option");
+    o.value = String(i + 1); o.textContent = label;
+    inc.appendChild(o);
+  });
+  inc.disabled = false;
+});
+$("ai-submit").addEventListener("click", async () => {
+  $("ai-err").textContent = "";
+  const hhSize = $("ai-size").value, bracket = $("ai-income").value;
+  if (!hhSize || !bracket) {
+    $("ai-err").textContent = STRINGS[lang].ai_err; return;
+  }
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
+               Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ action: "lmi_screener", public_id: selected.public_id,
+                           hh_size: Number(hhSize), income_bracket: Number(bracket),
+                           session_id: SESSION_ID }),
+  });
+  if (!r.ok) { $("ai-err").textContent = STRINGS[lang].ai_err; return; }
+  const res = await r.json();
+  $("addinc-wrap").classList.add("hidden");
+  $("ai-done").classList.remove("hidden");
+  if (res.likely_lmi) {
+    $("lmi-likely").classList.remove("hidden");
+    $("lmi-generic").classList.add("hidden");
+    $("lmi-slot-top").appendChild($("lmi-box"));
+  }
+  // Keep both caches consistent with the answered screener
+  try {
+    const c = JSON.parse(sessionStorage.getItem("hp_reveal") || "null");
+    if (c) {
+      c.d.likely_lmi = res.likely_lmi; c.d.screener_given = true;
+      sessionStorage.setItem("hp_reveal", JSON.stringify(c));
+    }
+    const s = JSON.parse(localStorage.getItem("hp_saved") || "null");
+    if (s) {
+      s.likely_lmi = res.likely_lmi; s.screener_given = true;
+      localStorage.setItem("hp_saved", JSON.stringify(s));
+    }
+  } catch { /* non-fatal */ }
+});
 
 // ---- LMI learn-more link: clicks are logged as info requests ----
 $("lmi-learn").addEventListener("click", () => {
@@ -702,12 +882,19 @@ const STRINGS = {
     code_label:"Enter the 6-digit code sent to your email",
     btn_verify:"Verify",
     result_intro:"Your household's eligible incentive amounts:",
-    row_les:"LES incentive - eligible to all LES customers installing a high-efficiency heat pump",
-    row_ac:"City of Lincoln incentive - heat pump replacing a central air conditioner",
-    row_hp:"City of Lincoln incentive - heat pump replacing an existing heat pump",
+    row_les_t:"LES incentive",
+    row_les_d:"Eligible to all LES customers installing a high-efficiency heat pump",
+    row_city_t:"City of Lincoln incentive",
+    row_ac_d:"Heat pump replacing a central air conditioner",
+    row_hp_d:"Heat pump replacing an existing heat pump",
 
-    tot_ac:"Total (LES + City) - replacing a central air conditioner",
-    tot_hp:"Total (LES + City) - replacing an existing heat pump",
+    tot_t:"Total (LES + City)",
+    wb_text:"Welcome back. You can view your saved incentive amounts without a new code.",
+    wb_btn:"View saved amounts",
+    ai_link:"Add income information",
+    ai_btn:"Submit",
+    ai_done:"Thank you - your answers have been recorded.",
+    ai_err:"Please answer both questions.",
     link_les:"LES Sustainable Energy Program",
     link_city:"City of Lincoln Heat Pump Incentives",
     elig_summary:"Program eligibility details",
@@ -753,7 +940,6 @@ const STRINGS = {
     opt_heat_pump:"Heat pump",
     opt_window_ac:"Window AC units only",
     opt_none:"No cooling equipment",
-    opt_lt5:"Under 5 years",
     opt_unknown:"Don't know",
     opt_yes:"Yes",
     opt_no:"No",
@@ -789,12 +975,19 @@ const STRINGS = {
     code_label:"Ingrese el código de 6 dígitos enviado a su correo",
     btn_verify:"Verificar",
     result_intro:"Los montos de incentivo elegibles de su hogar:",
-    row_les:"Incentivo de LES - elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia",
-    row_ac:"Incentivo de la Ciudad de Lincoln - bomba de calor que reemplaza un aire acondicionado central",
-    row_hp:"Incentivo de la Ciudad de Lincoln - bomba de calor que reemplaza una bomba de calor existente",
+    row_les_t:"Incentivo de LES",
+    row_les_d:"Elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia",
+    row_city_t:"Incentivo de la Ciudad de Lincoln",
+    row_ac_d:"Bomba de calor que reemplaza un aire acondicionado central",
+    row_hp_d:"Bomba de calor que reemplaza una bomba de calor existente",
 
-    tot_ac:"Total (LES + Ciudad) - reemplazo de aire acondicionado central",
-    tot_hp:"Total (LES + Ciudad) - reemplazo de bomba de calor existente",
+    tot_t:"Total (LES + Ciudad)",
+    wb_text:"Bienvenido de nuevo. Puede ver sus montos de incentivo guardados sin un nuevo código.",
+    wb_btn:"Ver montos guardados",
+    ai_link:"Agregar información de ingresos",
+    ai_btn:"Enviar",
+    ai_done:"Gracias - sus respuestas han sido registradas.",
+    ai_err:"Por favor responda ambas preguntas.",
     link_les:"Programa de Energía Sostenible de LES",
     link_city:"Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     elig_summary:"Detalles de elegibilidad del programa",
@@ -840,7 +1033,6 @@ const STRINGS = {
     opt_heat_pump:"Bomba de calor",
     opt_window_ac:"Solo aires acondicionados de ventana",
     opt_none:"Sin equipo de enfriamiento",
-    opt_lt5:"Menos de 5 años",
     opt_unknown:"No sé",
     opt_yes:"Sí",
     opt_no:"No",

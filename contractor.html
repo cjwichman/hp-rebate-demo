@@ -260,10 +260,10 @@
     <label for="q-age" data-i18n="q_age">Approximate age of the system being replaced</label>
     <select id="q-age">
       <option value="" data-i18n="opt_choose">Choose one...</option>
-      <option value="<5" data-i18n="opt_lt5">Under 5 years</option>
-      <option value="5-10">5-10</option>
-      <option value="10-15">10-15</option>
-      <option value="15-20">15-20</option>
+      <option value="0-4">0-4</option>
+      <option value="5-9">5-9</option>
+      <option value="10-14">10-14</option>
+      <option value="15-19">15-19</option>
       <option value="20+">20+</option>
       <option value="unknown" data-i18n="opt_unknown">Don't know</option>
     </select>
@@ -543,6 +543,16 @@ function renderSuggestions() {
   box.style.display = sugRows.length ? "block" : "none";
 }
 
+// Dismiss the suggestion list on an outside click or Escape. A
+// pasted address otherwise leaves the list open over the page.
+document.addEventListener("mousedown", (ev) => {
+  if (ev.target.closest("#suggestions") || ev.target === $("q")) return;
+  $("suggestions").style.display = "none";
+});
+$("q").addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") $("suggestions").style.display = "none";
+});
+
 function choose(i) {
   const row = sugRows[i];
   clearTimeout(logTimer);
@@ -813,7 +823,6 @@ const STRINGS = {
     opt_no:"No",
     warn_window:"Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.",
     warn_none:"The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Confirm with the program.",
-    opt_lt5:"Under 5 years",
     opt_unknown:"Don't know",
     btn_survey:"Look up rebate amounts",
     btn_another:"Look up another address",
@@ -912,7 +921,6 @@ const STRINGS = {
     opt_no:"No",
     warn_window:"El reemplazo de aire de ventana califica cuando la casa no tiene aire acondicionado central. Aplican los montos de reemplazo de AC central mostrados.",
     warn_none:"El incentivo de la Ciudad requiere reemplazar un aire acondicionado central, una bomba de calor existente, o (si no hay aire acondicionado central) una unidad de ventana. Instalar una bomba de calor sin reemplazar equipo existente puede no ser elegible para el incentivo de la Ciudad - el incentivo de LES arriba sigue aplicando. Confirme con el programa.",
-    opt_lt5:"Menos de 5 años",
     opt_unknown:"No sé",
     btn_survey:"Consultar montos de reembolso",
     btn_another:"Consultar otra dirección",
