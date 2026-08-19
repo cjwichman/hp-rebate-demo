@@ -278,8 +278,7 @@
         <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
         <td class="amt" id="tot-hp"></td></tr>
   </table>
-  <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
-  <div class="warn hidden" id="warn-none" data-i18n="warn_none">The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Contact the program to confirm.</div>
+  <div class="warn hidden" id="warn-none" data-i18n="warn_none">Installing a heat pump without replacing existing cooling equipment may not qualify for the City incentive. The LES incentive applies.</div>
   <p class="footnote" data-i18n="amt_note">* See City of Lincoln incentive eligibility details below.</p>
 
   <!-- LMI callout: keep this wording identical regardless of the
@@ -646,7 +645,6 @@ function showResult(d, cooling) {
   // and only the LES incentive appears for that scenario.
   if (amt.ac === 0) { $("row-ac").classList.add("hidden"); $("trow-ac").classList.add("hidden"); }
   if (amt.hp === 0) { $("row-hp").classList.add("hidden"); $("trow-hp").classList.add("hidden"); }
-  if (cooling === "window_ac") show("warn-window");
   if (scen === "none") show("warn-none");
   if (d.flag_multifamily) show("warn-mf");
   if (d.flag_new_construction) show("warn-new");
@@ -713,7 +711,7 @@ $("btn-another").addEventListener("click", () => {
   $("q-income").innerHTML =
     `<option value="prefer_not">${STRINGS[lang].opt_prefer_not}</option>`;
   $("q-income").disabled = true;
-  ["warn-mf", "warn-new", "warn-window", "warn-none", "funds-gen", "funds-lmi"].forEach(
+  ["warn-mf", "warn-new", "warn-none", "funds-gen", "funds-lmi"].forEach(
     (id) => { $(id).classList.add("hidden"); });
   hide("step-result"); hide("step-email"); hide("step-code");
   hide("step-survey");
@@ -947,8 +945,7 @@ const STRINGS = {
     amt_note:"* See City of Lincoln incentive eligibility details below.",
     lmi_head:"Income-qualified households: up to $4,000*",
     lmi_full:"Full conditions",
-    warn_window:"Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.",
-    warn_none:"The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Contact the program to confirm.",
+    warn_none:"Installing a heat pump without replacing existing cooling equipment may not qualify for the City incentive. The LES incentive applies.",
     scr_under:"Under",
     scr_over:"Over",
     lmi_likely:"Based on your answers, your household may qualify for the income-qualified incentive: $3,000 from the City plus the $1,000 LES incentive, $4,000 total. The standard amounts apply if income is not verified.",
@@ -1041,8 +1038,7 @@ const STRINGS = {
     amt_note:"* Vea los detalles de elegibilidad del incentivo de la Ciudad de Lincoln abajo.",
     lmi_head:"Hogares que califican por ingresos: hasta $4,000*",
     lmi_full:"Condiciones completas",
-    warn_window:"El reemplazo de aire de ventana califica cuando la casa no tiene aire acondicionado central. Aplican los montos de reemplazo de AC central mostrados.",
-    warn_none:"El incentivo de la Ciudad requiere reemplazar un aire acondicionado central, una bomba de calor existente, o (si no hay aire acondicionado central) una unidad de ventana. Instalar una bomba de calor sin reemplazar equipo existente puede no ser elegible para el incentivo de la Ciudad - el incentivo de LES arriba sigue aplicando. Contacte al programa para confirmar.",
+    warn_none:"Instalar una bomba de calor sin reemplazar equipo de enfriamiento existente puede no calificar para el incentivo de la Ciudad. El incentivo de LES aplica.",
     scr_under:"Menos de",
     scr_over:"Más de",
     lmi_likely:"Según sus respuestas, su hogar podría calificar para el incentivo por ingresos: $3,000 de la Ciudad más el incentivo de $1,000 de LES, $4,000 en total. Los montos estándar aplican si el ingreso no se verifica.",

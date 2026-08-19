@@ -231,8 +231,7 @@
           <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
           <td class="amt" id="tot-hp"></td></tr>
     </table>
-    <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
-    <div class="warn hidden" id="warn-none" data-i18n="warn_none">The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Confirm with the program.</div>
+    <div class="warn hidden" id="warn-none" data-i18n="warn_none">Installing a heat pump without replacing existing cooling equipment may not qualify for the City incentive. The LES incentive applies.</div>
     <p class="muted" style="font-size:12px;margin-top:8px" data-i18n="amt_note">* See City of Lincoln incentive eligibility details below.</p>
     <p class="warn hidden" id="funds-lmi" style="margin:8px 0"></p>
     <div class="lmi"><span data-i18n="lmi_note">Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.</span>
@@ -709,7 +708,6 @@ async function doLookup(row, answers) {
   $("trow-ac").classList.toggle("hidden", scen === "hp" || scen === "none");
   $("row-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
   $("trow-hp").classList.toggle("hidden", scen === "ac" || scen === "none");
-  $("warn-window").classList.toggle("hidden", $("q-cooling").value !== "window_ac");
   $("warn-none").classList.toggle("hidden", scen !== "none");
   // Funds-expended kill switches, mirroring the household page.
   const funds = d.funds || {};
@@ -828,8 +826,7 @@ const STRINGS = {
     opt_not_sure:"Not sure",
     opt_yes:"Yes",
     opt_no:"No",
-    warn_window:"Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.",
-    warn_none:"The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Confirm with the program.",
+    warn_none:"Installing a heat pump without replacing existing cooling equipment may not qualify for the City incentive. The LES incentive applies.",
     opt_unknown:"Don't know",
     btn_survey:"Look up rebate amounts",
     btn_another:"Look up another address",
@@ -928,8 +925,7 @@ const STRINGS = {
     opt_not_sure:"No estoy seguro",
     opt_yes:"Sí",
     opt_no:"No",
-    warn_window:"El reemplazo de aire de ventana califica cuando la casa no tiene aire acondicionado central. Aplican los montos de reemplazo de AC central mostrados.",
-    warn_none:"El incentivo de la Ciudad requiere reemplazar un aire acondicionado central, una bomba de calor existente, o (si no hay aire acondicionado central) una unidad de ventana. Instalar una bomba de calor sin reemplazar equipo existente puede no ser elegible para el incentivo de la Ciudad - el incentivo de LES arriba sigue aplicando. Confirme con el programa.",
+    warn_none:"Instalar una bomba de calor sin reemplazar equipo de enfriamiento existente puede no calificar para el incentivo de la Ciudad. El incentivo de LES aplica.",
     opt_unknown:"No sé",
     btn_survey:"Consultar montos de reembolso",
     btn_another:"Consultar otra dirección",
