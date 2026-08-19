@@ -28,9 +28,9 @@
   h1 { font-family:var(--slab); font-size:24px; font-weight:700; color:var(--navy);
        letter-spacing:-0.01em; }
   .sub { color:var(--muted); font-size:14px; margin:6px 0 20px; }
-  .demo-banner { background:#fdf6cf; border:1px solid #d9b13b; color:#6b5312;
-         padding:8px 14px; border-radius:9px; font-size:12.5px; text-align:center;
-         letter-spacing:.04em; text-transform:uppercase; font-weight:600;
+  .demo-banner { background:#fbecec; border:2px solid #8b1a1a; color:#8b1a1a;
+         padding:10px 14px; border-radius:9px; font-size:14px; text-align:center;
+         letter-spacing:.05em; text-transform:uppercase; font-weight:700;
          margin-bottom:14px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
           padding:22px; margin-bottom:16px;
@@ -111,6 +111,8 @@
   .partner-footer { background:var(--navy); border-radius:14px; padding:18px 22px;
                     margin-top:28px; text-align:center; }
   .partner-footer p { color:#cdd9e2; font-size:12.5px; margin:0 0 12px; }
+  .partner-footer .footer-links { margin:14px 0 0; }
+  .partner-footer .footer-links a { color:#ffffff; }
   .partner-logos { display:flex; align-items:center; justify-content:center; gap:26px; }
   .logo-lincoln { height:44px; width:auto; }
   .logo-les { height:22px; width:auto; }
@@ -150,6 +152,9 @@
     <img src="lincoln-logo.png" alt="City of Lincoln" class="logo-lincoln">
     <img src="les-logo.png" alt="Lincoln Electric System" class="logo-les">
   </div>
+  <p class="footer-links"><span data-i18n="footer_learn">Learn more about heat pump incentives:</span>
+    <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
+    <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="link_city">City of Lincoln Heat Pump Incentives</a></p>
 </footer>
 
 <script>
@@ -158,6 +163,9 @@
 const STRINGS = {
   en: {
     demo: "DEMO SYSTEM - incentive amounts are not final",
+    footer_learn: "Learn more about heat pump incentives:",
+    link_les: "LES Sustainable Energy Program",
+    link_city: "City of Lincoln Heat Pump Incentives",
     title: "City of Lincoln Heat Pump Rebate Program",
     hh_title: "I'm a homeowner or resident",
     hh_desc: "Look up your household's eligible incentive amounts by verifying your address and email.",
@@ -168,6 +176,9 @@ const STRINGS = {
   },
   es: {
     demo: "SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
+    footer_learn: "Más información sobre incentivos para bombas de calor:",
+    link_les: "Programa de Energía Sostenible de LES",
+    link_city: "Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     title: "Programa de Reembolso de Bomba de Calor de la Ciudad de Lincoln",
     hh_title: "Soy propietario o residente",
     hh_desc: "Consulte los montos de incentivo elegibles de su hogar verificando su dirección y correo electrónico.",

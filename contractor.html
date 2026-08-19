@@ -28,9 +28,9 @@
   h1 { font-family:var(--slab); font-size:24px; font-weight:700; color:var(--navy);
        letter-spacing:-0.01em; }
   .sub { color:var(--muted); font-size:14px; margin:6px 0 20px; }
-  .demo-banner { background:#fdf6cf; border:1px solid #d9b13b; color:#6b5312;
-         padding:8px 14px; border-radius:9px; font-size:12.5px; text-align:center;
-         letter-spacing:.04em; text-transform:uppercase; font-weight:600;
+  .demo-banner { background:#fbecec; border:2px solid #8b1a1a; color:#8b1a1a;
+         padding:10px 14px; border-radius:9px; font-size:14px; text-align:center;
+         letter-spacing:.05em; text-transform:uppercase; font-weight:700;
          margin-bottom:14px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
           padding:22px; margin-bottom:16px;
@@ -87,6 +87,8 @@
   table.amounts tr.total td:last-child { border-radius:0 0 8px 0; }
   table.amounts tr.total td.amt { font-size:18px; color:var(--navy); }
   .footnote { font-size:12px; color:var(--muted); text-align:left; margin-top:10px; }
+  .rl { display:block; font-weight:600; }
+  .rd { display:block; font-size:12.5px; color:var(--muted); }
   .topbar { display:flex; justify-content:space-between; align-items:center;
             font-size:14px; margin-bottom:12px; }
   .topbar a { color:var(--navy); text-decoration:none; cursor:pointer; }
@@ -112,6 +114,8 @@
   .partner-footer { background:var(--navy); border-radius:14px; padding:18px 22px;
                     margin-top:28px; text-align:center; }
   .partner-footer p { color:#cdd9e2; font-size:12.5px; margin:0 0 12px; }
+  .partner-footer .footer-links { margin:14px 0 0; }
+  .partner-footer .footer-links a { color:#ffffff; }
   .partner-logos { display:flex; align-items:center; justify-content:center; gap:26px; }
   .logo-lincoln { height:44px; width:auto; }
   .logo-les { height:22px; width:auto; }
@@ -211,27 +215,28 @@
     <div id="res-addr" style="font-size:14px;color:var(--muted)"></div>
     <div class="warn hidden" id="funds-gen"></div>
     <table class="amounts">
-      <tr><td data-i18n="row_les">LES incentive - eligible to all LES customers installing a high-efficiency heat pump</td>
+      <tr><td><span class="rl" data-i18n="row_les_t">LES incentive</span>
+          <span class="rd" data-i18n-html="row_les_d">Eligible to all LES customers installing a high-efficiency heat pump (<a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener">eligibility details</a>)</span></td>
           <td class="amt">$1,000</td></tr>
-      <tr id="row-ac"><td data-i18n="row_ac">City incentive - replacing central air conditioner</td>
+      <tr id="row-ac"><td><span class="rl" data-i18n="row_city_t">City of Lincoln incentive</span>
+          <span class="rd" data-i18n="row_ac_d">Heat pump replacing a central air conditioner</span></td>
           <td class="amt" id="amt-ac"></td></tr>
-      <tr id="row-hp"><td data-i18n="row_hp">City incentive - replacing existing heat pump</td>
+      <tr id="row-hp"><td><span class="rl" data-i18n="row_city_t">City of Lincoln incentive</span>
+          <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
           <td class="amt" id="amt-hp"></td></tr>
-      <tr class="total" id="trow-ac"><td data-i18n="tot_ac">Total (LES + City) - replacing central AC</td>
+      <tr class="total" id="trow-ac"><td><span class="rl" data-i18n="tot_t">Total (LES + City)</span>
+          <span class="rd" data-i18n="row_ac_d">Heat pump replacing a central air conditioner</span></td>
           <td class="amt" id="tot-ac"></td></tr>
-      <tr class="total" id="trow-hp"><td data-i18n="tot_hp">Total (LES + City) - replacing existing heat pump</td>
+      <tr class="total" id="trow-hp"><td><span class="rl" data-i18n="tot_t">Total (LES + City)</span>
+          <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
           <td class="amt" id="tot-hp"></td></tr>
     </table>
     <div class="warn hidden" id="warn-window" data-i18n="warn_window">Window AC replacement qualifies when the home has no central air conditioning. The central-AC replacement amounts shown apply.</div>
     <div class="warn hidden" id="warn-none" data-i18n="warn_none">The City incentive requires replacing an existing central air conditioner, heat pump, or (where there is no central air conditioning) a window unit. Installing a heat pump without replacing existing equipment may not be eligible for the City incentive - the LES incentive above still applies. Confirm with the program.</div>
-    <p class="muted" style="font-size:12px;margin-top:8px" data-i18n="amt_note">* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.</p>
+    <p class="muted" style="font-size:12px;margin-top:8px" data-i18n="amt_note">* See City of Lincoln incentive eligibility details below.</p>
     <p class="warn hidden" id="funds-lmi" style="margin:8px 0"></p>
     <div class="lmi"><span data-i18n="lmi_note">Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.</span>
       <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_link">How to verify LMI eligibility</a></div>
-    <p class="links">
-      <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
-      <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="link_city">City Heat Pump Incentives</a>
-    </p>
     <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">Multi-family property - eligibility rules may differ. Confirm with the program.</div>
     <div class="warn hidden" id="warn-new" data-i18n="warn_new">Recently created premise - may be new construction, which is not eligible for City incentives.</div>
     <button id="btn-another" class="secondary" style="margin-top:12px" data-i18n="btn_another">Look up another address</button>
@@ -745,14 +750,15 @@ const STRINGS = {
     partners:"A partnership between the City of Lincoln and Lincoln Electric System",
     title:"Contractor Platform",
     subtitle:"Look up a customer's eligible incentive amounts",
-    row_les:"LES incentive - eligible to all LES customers installing a high-efficiency heat pump",
-    row_ac:"City incentive - replacing central air conditioner",
-    row_hp:"City incentive - replacing existing heat pump",
+    row_les_t:"LES incentive",
+    row_les_d:'Eligible to all LES customers installing a high-efficiency heat pump (<a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener">eligibility details</a>)',
+    row_city_t:"City of Lincoln incentive",
+    row_ac_d:"Heat pump replacing a central air conditioner",
+    row_hp_d:"Heat pump replacing an existing heat pump",
     lmi_note:"Income-qualified customers may instead be eligible for the $3,000 low- and moderate-income City incentive, which replaces the City amounts above. The $1,000 LES incentive still applies in addition (total $4,000). Income at or below 80% of the Lincoln Area Median Income; approval required before installation; rental units not eligible.",
-    tot_ac:"Total (LES + City) - replacing central AC",
-    tot_hp:"Total (LES + City) - replacing existing heat pump",
+    tot_t:"Total (LES + City)",
     lmi_link:"How to verify LMI eligibility",
-    elig_summary:"Program eligibility details",
+    elig_summary:"City of Lincoln incentive eligibility details",
     elig_who_h:"Who is eligible:",
     elig_who_intro:"Residents of the City of Lincoln who:",
     elig_who_1:"Live in or own and rent out a single-family detached home (rental units not eligible for the LMI incentive)",
@@ -771,8 +777,9 @@ const STRINGS = {
     elig_not_7:"More than one heat pump per household per City program year (Sept 1-Aug 31)",
     elig_not_8:"Installation of a new heat pump without replacement of an older system",
     elig_more:"Full program details - City of Lincoln Heat Pump Incentives",
+    footer_learn:"Learn more about heat pump incentives:",
     link_les:"LES Sustainable Energy Program",
-    link_city:"City Heat Pump Incentives",
+    link_city:"City of Lincoln Heat Pump Incentives",
     btn_login:"Log in",
     li_email:"Email",
     li_pw:"Password",
@@ -828,7 +835,7 @@ const STRINGS = {
     btn_another:"Look up another address",
     funds_gen:"City incentives for the general population for this fiscal year have been expended as of {date}. The $1,000 LES incentive is still available to all LES customers installing a high-efficiency heat pump.",
     funds_lmi:"The $3,000 low- and moderate-income City incentive for this fiscal year has been expended as of {date}.",
-    amt_note:"* City amounts are subject to program eligibility conditions, including equipment requirements, the type of system being replaced, and program terms. See the program eligibility details below.",
+    amt_note:"* See City of Lincoln incentive eligibility details below.",
     addr_label:"Customer address",
     warn_mf:"Multi-family property - eligibility rules may differ. Confirm with the program.",
     warn_new:"Recently created premise - may be new construction, which is not eligible for City incentives.",
@@ -843,14 +850,15 @@ const STRINGS = {
     partners:"Una colaboración entre la Ciudad de Lincoln y Lincoln Electric System",
     title:"Plataforma de Contratistas",
     subtitle:"Consulte los montos de incentivo elegibles de un cliente",
-    row_les:"Incentivo de LES - elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia",
-    row_ac:"Incentivo de la Ciudad - reemplazo de aire acondicionado central",
-    row_hp:"Incentivo de la Ciudad - reemplazo de bomba de calor existente",
+    row_les_t:"Incentivo de LES",
+    row_les_d:'Elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia (<a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener">detalles de elegibilidad</a>)',
+    row_city_t:"Incentivo de la Ciudad de Lincoln",
+    row_ac_d:"Bomba de calor que reemplaza un aire acondicionado central",
+    row_hp_d:"Bomba de calor que reemplaza una bomba de calor existente",
     lmi_note:"Los clientes que califiquen por ingresos pueden ser elegibles para el incentivo de $3,000 de la Ciudad para ingresos bajos y moderados, el cual reemplaza los montos de la Ciudad indicados arriba. El incentivo de $1,000 de LES aún aplica adicionalmente (total $4,000). Ingreso igual o inferior al 80% del ingreso medio del área de Lincoln; se requiere aprobación antes de la instalación; unidades de alquiler no elegibles.",
-    tot_ac:"Total (LES + Ciudad) - reemplazo de aire acondicionado central",
-    tot_hp:"Total (LES + Ciudad) - reemplazo de bomba de calor existente",
+    tot_t:"Total (LES + Ciudad)",
     lmi_link:"Cómo verificar la elegibilidad LMI",
-    elig_summary:"Detalles de elegibilidad del programa",
+    elig_summary:"Detalles de elegibilidad del incentivo de la Ciudad de Lincoln",
     elig_who_h:"Quién es elegible:",
     elig_who_intro:"Residentes de la Ciudad de Lincoln que:",
     elig_who_1:"Viven en, o son propietarios y alquilan, una casa unifamiliar independiente (las unidades de alquiler no son elegibles para el incentivo LMI)",
@@ -869,8 +877,9 @@ const STRINGS = {
     elig_not_7:"Más de una bomba de calor por hogar por año del programa de la Ciudad (1 sept - 31 ago)",
     elig_not_8:"Instalación de una bomba de calor nueva sin reemplazo de un sistema antiguo",
     elig_more:"Detalles completos del programa - Incentivos de Bomba de Calor de la Ciudad de Lincoln",
+    footer_learn:"Más información sobre incentivos para bombas de calor:",
     link_les:"Programa de Energía Sostenible de LES",
-    link_city:"Incentivos de Bomba de Calor de la Ciudad",
+    link_city:"Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     btn_login:"Iniciar sesión",
     li_email:"Correo electrónico",
     li_pw:"Contraseña",
@@ -926,7 +935,7 @@ const STRINGS = {
     btn_another:"Consultar otra dirección",
     funds_gen:"Los incentivos de la Ciudad para la población general de este año fiscal se han agotado a partir del {date}. El incentivo de $1,000 de LES sigue disponible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia.",
     funds_lmi:"El incentivo de la Ciudad de $3,000 para ingresos bajos y moderados de este año fiscal se ha agotado a partir del {date}.",
-    amt_note:"* Los montos de la Ciudad están sujetos a las condiciones de elegibilidad del programa, incluidos los requisitos del equipo, el tipo de sistema que se reemplaza y los términos del programa. Vea los detalles de elegibilidad del programa abajo.",
+    amt_note:"* Vea los detalles de elegibilidad del incentivo de la Ciudad de Lincoln abajo.",
     addr_label:"Dirección del cliente",
     warn_mf:"Propiedad multifamiliar - las reglas de elegibilidad pueden diferir. Confirme con el programa.",
     warn_new:"Propiedad registrada recientemente - puede ser construcción nueva, no elegible para incentivos de la Ciudad.",
@@ -957,6 +966,8 @@ function applyLang() {
   document.documentElement.lang = lang;
   for (const el of document.querySelectorAll("[data-i18n]"))
     el.textContent = STRINGS[lang][el.dataset.i18n];
+  for (const el of document.querySelectorAll("[data-i18n-html]"))
+    el.innerHTML = STRINGS[lang][el.dataset.i18nHtml];
   $("lang-toggle").textContent = STRINGS[lang].toggle;
   $("home-link").setAttribute("href", lang === "es" ? "index.html?lang=es" : "index.html");
 }
@@ -965,7 +976,7 @@ applyLang();
 logEvent("page_view", { lang });
 </script>
 <details class="elig">
-  <summary data-i18n="elig_summary">Program eligibility details</summary>
+  <summary data-i18n="elig_summary">City of Lincoln incentive eligibility details</summary>
   <p class="elig-h" data-i18n="elig_who_h">Who is eligible:</p>
   <p data-i18n="elig_who_intro">Residents of the City of Lincoln who:</p>
   <ul>
@@ -998,6 +1009,9 @@ logEvent("page_view", { lang });
     <img src="lincoln-logo.png" alt="City of Lincoln" class="logo-lincoln">
     <img src="les-logo.png" alt="Lincoln Electric System" class="logo-les">
   </div>
+  <p class="footer-links"><span data-i18n="footer_learn">Learn more about heat pump incentives:</span>
+    <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
+    <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="link_city">City of Lincoln Heat Pump Incentives</a></p>
 </footer>
 </body>
 </html>
