@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Heat Pump Rebates - Lincoln, NE</title>
+<title>Heat Pump Incentives - Lincoln, NE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -147,8 +147,8 @@
 </div>
 <div class="demo-banner" data-i18n="demo">DEMO SYSTEM - incentive amounts are not final</div>
 
-<h1 data-i18n="title">City of Lincoln Heat Pump Rebate</h1>
-<p class="sub" id="subtitle" data-i18n="subtitle">Enter your address to see your eligible rebate amount</p>
+<h1 data-i18n="title">City of Lincoln Heat Pump Incentives</h1>
+<p class="sub" id="subtitle" data-i18n="subtitle">Enter your address to see your eligible incentive amounts</p>
 
 <!-- Eligibility details (exact City of Lincoln program language) -->
 
@@ -227,8 +227,10 @@
     <option value="working" data-i18n="opt_working">Working</option>
     <option value="not_working" data-i18n="opt_not_working">Not working</option>
     <option value="partially_working" data-i18n="opt_partial">Partially working</option>
+    <option value="not_sure" data-i18n="opt_not_sure">Not sure</option>
   </select>
   <label for="q-lmi" data-i18n="q_lmi">Low- and moderate-income households may be eligible for larger incentives. Do you think your household would qualify (income at or below 80% of the Lincoln Area Median Income)?</label>
+  <p class="hint"><a href="https://www.lincoln.ne.gov/City/Departments/Urban-Development/Housing/Income-Limits" target="_blank" rel="noopener" data-i18n="lmi_guidelines">See the City's income guidelines</a></p>
   <select id="q-lmi">
     <option value="" data-i18n="opt_choose" style="color:var(--ink)">Choose one...</option>
     <option value="yes" data-i18n="opt_yes">Yes</option>
@@ -263,22 +265,22 @@
   <div id="lmi-slot-top"></div>
   <table class="amounts" id="amt-table">
     <tr><td><span class="rl" data-i18n="row_les_t">LES incentive</span>
-        <span class="rd" data-i18n-html="row_les_d">Eligible to all LES customers installing a high-efficiency heat pump (<a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener">eligibility details</a>)</span></td>
+        <span class="rd" data-i18n-html="row_les_d">Eligible to all LES customers installing a high-efficiency heat pump (<a href="https://www.les.com/sites/default/files/Residential-High-Efficiency-Heat%20Pumps-Air-Conditioners-Incentives-Guidelines-Process.pdf" target="_blank" rel="noopener">eligibility details</a>)</span></td>
         <td class="amt">$1,000</td></tr>
     <tr id="row-ac"><td><span class="rl" data-i18n="row_city_t">City of Lincoln incentive</span>
-        <span class="rd" data-i18n="row_ac_d">Heat pump replacing a central air conditioner</span></td>
+        <span class="rd" data-i18n="row_ac_d">Heat pump replacing an air conditioner</span></td>
         <td class="amt" id="amt-ac"></td></tr>
     <tr id="row-hp"><td><span class="rl" data-i18n="row_city_t">City of Lincoln incentive</span>
         <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
         <td class="amt" id="amt-hp"></td></tr>
     <tr class="total" id="trow-ac"><td><span class="rl" data-i18n="tot_t">Total (LES + City)</span>
-        <span class="rd" data-i18n="row_ac_d">Heat pump replacing a central air conditioner</span></td>
+        <span class="rd" data-i18n="row_ac_d">Heat pump replacing an air conditioner</span></td>
         <td class="amt" id="tot-ac"></td></tr>
     <tr class="total" id="trow-hp"><td><span class="rl" data-i18n="tot_t">Total (LES + City)</span>
         <span class="rd" data-i18n="row_hp_d">Heat pump replacing an existing heat pump</span></td>
         <td class="amt" id="tot-hp"></td></tr>
   </table>
-  <div class="warn hidden" id="warn-none" data-i18n="warn_none">Installing a heat pump without replacing existing cooling equipment may not qualify for the City incentive. The LES incentive applies.</div>
+  <div class="warn hidden" id="warn-none" data-i18n="warn_none">Installing a heat pump without replacing existing cooling equipment will not qualify for the City incentive. The LES incentive applies.</div>
   <p class="footnote" data-i18n="amt_note">* See City of Lincoln incentive eligibility details below.</p>
 
   <!-- LMI callout: keep this wording identical regardless of the
@@ -289,6 +291,8 @@
     <p class="warn hidden" id="funds-lmi" style="margin:0 0 10px"></p>
     <p class="hidden" id="lmi-likely" data-i18n="lmi_likely">Based on your answers, your household may qualify for the income-qualified incentive: $3,000 from the City plus the $1,000 LES incentive, $4,000 total. The standard amounts apply if income is not verified.</p>
     <p id="lmi-generic" data-i18n="lmi_generic">Low- and moderate-income households (income at or below 80% of the Lincoln Area Median Income) may be eligible for larger incentives.</p>
+    <p><span data-i18n="lmi_contact">To start the income verification process, contact</span>
+      <a href="mailto:urbandev@lincoln.ne.gov">urbandev@lincoln.ne.gov</a>.</p>
 
     <!-- Post-reveal income screener: shown only when the optional
          screener was skipped in the survey. Submits through the same
@@ -311,8 +315,8 @@
     <p style="margin-top:12px">
       <a id="lmi-learn" class="linkbtn" href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="lmi_learn">Learn more about income verification</a></p>
   </div>
-  <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">This address is part of a multi-family property. Program eligibility rules for multi-family buildings may differ - confirm with the program before proceeding.</div>
-  <div class="warn hidden" id="warn-new" data-i18n="warn_new">This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.</div>
+  <div class="warn hidden" id="warn-mf" data-i18n="warn_mf">This property is identified as multi-family and may not be eligible for City of Lincoln funding. See the City of Lincoln guidelines or contact SEP@les.com.</div>
+  <div class="warn hidden" id="warn-new" data-i18n="warn_new">This property may be new construction and may not be eligible for City of Lincoln funding. See the City of Lincoln guidelines or contact SEP@les.com.</div>
   <button id="btn-another" class="secondary" data-i18n="btn_another">Start over</button>
 </div>
 
@@ -866,7 +870,7 @@ const STRINGS = {
     home:"\u2190 Home",
     demo:"DEMO SYSTEM - incentive amounts are not final",
     partners:"A partnership between the City of Lincoln and Lincoln Electric System",
-    title:"City of Lincoln Heat Pump Rebate",
+    title:"City of Lincoln Heat Pump Incentives",
     subtitle:"Enter your address to see your eligible incentive amounts",
     addr_label:"Enter your address",
     addr_hint:"Start typing, then choose your address from the list (arrow keys or click).",
@@ -879,9 +883,9 @@ const STRINGS = {
     btn_verify:"Verify",
     result_intro:"Your household's eligible incentive amounts:",
     row_les_t:"LES incentive",
-    row_les_d:'Eligible to all LES customers installing a high-efficiency heat pump (<a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener">eligibility details</a>)',
+    row_les_d:'Eligible to all LES customers installing a high-efficiency heat pump (<a href="https://www.les.com/sites/default/files/Residential-High-Efficiency-Heat%20Pumps-Air-Conditioners-Incentives-Guidelines-Process.pdf" target="_blank" rel="noopener">eligibility details</a>)',
     row_city_t:"City of Lincoln incentive",
-    row_ac_d:"Heat pump replacing a central air conditioner",
+    row_ac_d:"Heat pump replacing an air conditioner",
     row_hp_d:"Heat pump replacing an existing heat pump",
 
     tot_t:"Total (LES + City)",
@@ -913,8 +917,8 @@ const STRINGS = {
     elig_not_7:"More than one heat pump per household per City program year (Sept 1-Aug 31)",
     elig_not_8:"Installation of a new heat pump without replacement of an older system",
     elig_more:"Full program details - City of Lincoln Heat Pump Incentives",
-    warn_mf:"This address is part of a multi-family property. Program eligibility rules for multi-family buildings may differ - confirm with the program before proceeding.",
-    warn_new:"This premise was created recently and may be new construction, which is not eligible for City of Lincoln incentives. The program will verify eligibility.",
+    warn_mf:"This property is identified as multi-family and may not be eligible for City of Lincoln funding. See the City of Lincoln guidelines or contact SEP@les.com.",
+    warn_new:"This property may be new construction and may not be eligible for City of Lincoln funding. See the City of Lincoln guidelines or contact SEP@les.com.",
     toggle:"Español (beta)",
     err_email:"Please enter a valid email address.",
     err_code:"Enter the 6-digit code.",
@@ -945,12 +949,14 @@ const STRINGS = {
     amt_note:"* See City of Lincoln incentive eligibility details below.",
     lmi_head:"Income-qualified households: up to $4,000*",
     lmi_full:"Full conditions",
-    warn_none:"Installing a heat pump without replacing existing cooling equipment may not qualify for the City incentive. The LES incentive applies.",
+    warn_none:"Installing a heat pump without replacing existing cooling equipment will not qualify for the City incentive. The LES incentive applies.",
     scr_under:"Under",
     scr_over:"Over",
     lmi_likely:"Based on your answers, your household may qualify for the income-qualified incentive: $3,000 from the City plus the $1,000 LES incentive, $4,000 total. The standard amounts apply if income is not verified.",
     lmi_generic:"Low- and moderate-income households (income at or below 80% of the Lincoln Area Median Income) may be eligible for larger incentives.",
     lmi_learn:"Learn more about income verification",
+    lmi_contact:"To start the income verification process, contact",
+    lmi_guidelines:"See the City's income guidelines",
     btn_another:"Start over",
     funds_gen:"City incentives for the general population for this fiscal year have been expended as of {date}. The $1,000 LES incentive is still available to all LES customers installing a high-efficiency heat pump.",
     funds_lmi:"The $3,000 low- and moderate-income City incentive for this fiscal year has been expended as of {date}.",
@@ -959,7 +965,7 @@ const STRINGS = {
     home:"\u2190 Inicio",
     demo:"SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
     partners:"Una colaboración entre la Ciudad de Lincoln y Lincoln Electric System",
-    title:"Reembolso de Bomba de Calor de la Ciudad de Lincoln",
+    title:"Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     subtitle:"Ingrese su dirección para ver los montos de incentivo elegibles",
     addr_label:"Ingrese su dirección",
     addr_hint:"Empiece a escribir y elija su dirección de la lista (flechas o clic).",
@@ -972,9 +978,9 @@ const STRINGS = {
     btn_verify:"Verificar",
     result_intro:"Los montos de incentivo elegibles de su hogar:",
     row_les_t:"Incentivo de LES",
-    row_les_d:'Elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia (<a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener">detalles de elegibilidad</a>)',
+    row_les_d:'Elegible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia (<a href="https://www.les.com/sites/default/files/Residential-High-Efficiency-Heat%20Pumps-Air-Conditioners-Incentives-Guidelines-Process.pdf" target="_blank" rel="noopener">detalles de elegibilidad</a>)',
     row_city_t:"Incentivo de la Ciudad de Lincoln",
-    row_ac_d:"Bomba de calor que reemplaza un aire acondicionado central",
+    row_ac_d:"Bomba de calor que reemplaza un aire acondicionado",
     row_hp_d:"Bomba de calor que reemplaza una bomba de calor existente",
 
     tot_t:"Total (LES + Ciudad)",
@@ -1006,8 +1012,8 @@ const STRINGS = {
     elig_not_7:"Más de una bomba de calor por hogar por año del programa de la Ciudad (1 sept - 31 ago)",
     elig_not_8:"Instalación de una bomba de calor nueva sin reemplazo de un sistema antiguo",
     elig_more:"Detalles completos del programa - Incentivos de Bomba de Calor de la Ciudad de Lincoln",
-    warn_mf:"Esta dirección es parte de una propiedad multifamiliar. Las reglas de elegibilidad pueden diferir - confirme con el programa antes de continuar.",
-    warn_new:"Esta propiedad fue registrada recientemente y puede ser construcción nueva, la cual no es elegible para incentivos de la Ciudad de Lincoln. El programa verificará la elegibilidad.",
+    warn_mf:"Esta propiedad está identificada como multifamiliar y puede no ser elegible para fondos de la Ciudad de Lincoln. Vea las guías de la Ciudad de Lincoln o contacte SEP@les.com.",
+    warn_new:"Esta propiedad puede ser construcción nueva y puede no ser elegible para fondos de la Ciudad de Lincoln. Vea las guías de la Ciudad de Lincoln o contacte SEP@les.com.",
     toggle:"English",
     err_email:"Por favor ingrese un correo electrónico válido.",
     err_code:"Ingrese el código de 6 dígitos.",
@@ -1038,12 +1044,14 @@ const STRINGS = {
     amt_note:"* Vea los detalles de elegibilidad del incentivo de la Ciudad de Lincoln abajo.",
     lmi_head:"Hogares que califican por ingresos: hasta $4,000*",
     lmi_full:"Condiciones completas",
-    warn_none:"Instalar una bomba de calor sin reemplazar equipo de enfriamiento existente puede no calificar para el incentivo de la Ciudad. El incentivo de LES aplica.",
+    warn_none:"Instalar una bomba de calor sin reemplazar equipo de enfriamiento existente no calificará para el incentivo de la Ciudad. El incentivo de LES aplica.",
     scr_under:"Menos de",
     scr_over:"Más de",
     lmi_likely:"Según sus respuestas, su hogar podría calificar para el incentivo por ingresos: $3,000 de la Ciudad más el incentivo de $1,000 de LES, $4,000 en total. Los montos estándar aplican si el ingreso no se verifica.",
     lmi_generic:"Los hogares de ingresos bajos y moderados (ingreso igual o inferior al 80% del ingreso medio del área de Lincoln) pueden ser elegibles para incentivos más grandes.",
     lmi_learn:"Más información sobre la verificación de ingresos",
+    lmi_contact:"Para iniciar el proceso de verificación de ingresos, contacte a",
+    lmi_guidelines:"Vea las guías de ingresos de la Ciudad",
     btn_another:"Empezar de nuevo",
     funds_gen:"Los incentivos de la Ciudad para la población general de este año fiscal se han agotado a partir del {date}. El incentivo de $1,000 de LES sigue disponible para todos los clientes de LES que instalen una bomba de calor de alta eficiencia.",
     funds_lmi:"El incentivo de la Ciudad de $3,000 para ingresos bajos y moderados de este año fiscal se ha agotado a partir del {date}.",
@@ -1099,7 +1107,7 @@ logEvent("page_view", { lang, restored: restoredView });
     <img src="les-logo.png" alt="Lincoln Electric System" class="logo-les">
   </div>
   <p class="footer-links"><span data-i18n="footer_learn">Learn more about heat pump incentives:</span>
-    <a href="https://www.les.com/sustainability/sustainable-energy-program" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
+    <a href="https://www.les.com/sites/default/files/Residential-High-Efficiency-Heat%20Pumps-Air-Conditioners-Incentives-Guidelines-Process.pdf" target="_blank" rel="noopener" data-i18n="link_les">LES Sustainable Energy Program</a> &middot;
     <a href="https://www.lincoln.ne.gov/City/Projects-Programs-Initiatives/Resilient-Lincoln/Heat-Pump-Incentives" target="_blank" rel="noopener" data-i18n="link_city">City of Lincoln Heat Pump Incentives</a></p>
 </footer>
 </body>
