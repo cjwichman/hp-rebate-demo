@@ -590,6 +590,10 @@ $("btn-survey").addEventListener("click", async () => {
     $("err-code").textContent = e.error || "Verification failed."; return;
   }
   const d = await r.json();
+  // Perceived-LMI answer rides along with the payload so display
+  // logic and cached restores see it. Display only - the server
+  // logged the answer with the survey.
+  d.lmi_perceived = $("q-lmi").value;
   // Cache the result for this tab so an accidental refresh restores
   // the screen without re-verification. sessionStorage is tab-scoped
   // and cleared when the tab closes; nothing persists across visits.
@@ -611,6 +615,7 @@ $("btn-survey").addEventListener("click", async () => {
         display_scenario: d.display_scenario,
         cooling: $("q-cooling").value,
         likely_lmi: d.likely_lmi, screener_given: d.screener_given,
+        lmi_perceived: d.lmi_perceived,
       }));
     }
   } catch { /* non-fatal */ }
@@ -657,8 +662,14 @@ function showResult(d, cooling) {
   // income-qualified callout: the household has told us the larger
   // incentive does not apply to them. The callout stays for likely-
   // qualifying answers and for households that skipped the screener.
+  // An answered screener outranks the perceived question: a stated
+  // income at or below the limit shows the callout even after a
+  // perceived "no". With the screener skipped, an informed "no" to
+  // the perceived question (the income guidelines are linked right
+  // above it) hides the callout rather than re-advertising.
   const lmiOver = !!d.screener_given && !d.likely_lmi;
-  $("lmi-box").classList.toggle("hidden", lmiOver);
+  const perceivedNo = !d.screener_given && d.lmi_perceived === "no";
+  $("lmi-box").classList.toggle("hidden", lmiOver || perceivedNo);
   $("lmi-likely").classList.toggle("hidden", !d.likely_lmi);
   $("lmi-generic").classList.toggle("hidden", !!d.likely_lmi);
   // Likely-LMI households see the callout above the amounts table;
@@ -787,6 +798,7 @@ $("wb-btn").addEventListener("click", async () => {
   d.display_scenario = savedView.display_scenario;
   d.likely_lmi = savedView.likely_lmi;
   d.screener_given = savedView.screener_given;
+  d.lmi_perceived = savedView.lmi_perceived;
   selected = { public_id: savedView.public_id,
                display_address: d.display_address };
   hide("wb-banner");
