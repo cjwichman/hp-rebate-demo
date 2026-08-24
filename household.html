@@ -653,6 +653,12 @@ function showResult(d, cooling) {
   // LMI callout variant: the "likely" message only when the optional
   // screener answers imply income at or below the 80% AMI limit
   // (computed server-side). The generic message is the default.
+  // A screener answer above the income limit hides the entire
+  // income-qualified callout: the household has told us the larger
+  // incentive does not apply to them. The callout stays for likely-
+  // qualifying answers and for households that skipped the screener.
+  const lmiOver = !!d.screener_given && !d.likely_lmi;
+  $("lmi-box").classList.toggle("hidden", lmiOver);
   $("lmi-likely").classList.toggle("hidden", !d.likely_lmi);
   $("lmi-generic").classList.toggle("hidden", !!d.likely_lmi);
   // Likely-LMI households see the callout above the amounts table;
@@ -834,6 +840,9 @@ $("ai-submit").addEventListener("click", async () => {
     $("lmi-likely").classList.remove("hidden");
     $("lmi-generic").classList.add("hidden");
     $("lmi-slot-top").appendChild($("lmi-box"));
+  } else {
+    // Over the limit: the callout no longer applies to this household.
+    $("lmi-box").classList.add("hidden");
   }
   // Keep both caches consistent with the answered screener
   try {
