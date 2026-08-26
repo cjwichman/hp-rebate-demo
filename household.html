@@ -202,13 +202,6 @@
     <option value="heat_pump" data-i18n="opt_heat_pump">Heat pump</option>
     <option value="none" data-i18n="opt_none">No cooling equipment</option>
   </select>
-  <label for="q-heating" data-i18n="q_heating">Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?</label>
-  <select id="q-heating">
-    <option value="" data-i18n="opt_choose" style="color:var(--ink)">Choose one...</option>
-    <option value="yes" data-i18n="opt_yes">Yes</option>
-    <option value="no" data-i18n="opt_no">No</option>
-    <option value="not_sure" data-i18n="opt_not_sure">Not sure</option>
-  </select>
   <label for="q-age" data-i18n="q_age">Approximate age of the system being replaced</label>
   <select id="q-age">
     <option value="" data-i18n="opt_choose" style="color:var(--ink)">Choose one...</option>
@@ -559,7 +552,6 @@ $("btn-survey").addEventListener("click", async () => {
   $("err-survey").textContent = "";
   const answers = {
     cooling_equipment: $("q-cooling").value,
-    heating_also_replaced: $("q-heating").value,
     is_system_working: $("q-working").value,
     system_age: $("q-age").value,
     lmi_perceived: $("q-lmi").value,
@@ -724,7 +716,7 @@ $("btn-another").addEventListener("click", () => {
   $("q").value = "";
   $("suggestions").innerHTML = "";
   $("code").value = "";
-  ["q-cooling", "q-heating", "q-age", "q-working", "q-lmi"].forEach(
+  ["q-cooling", "q-age", "q-working", "q-lmi"].forEach(
     (id) => { $(id).value = ""; });
   $("q-size").value = "prefer_not";
   $("q-income").innerHTML =
@@ -946,7 +938,6 @@ const STRINGS = {
     svy_intro:"Please answer a few questions about the property's existing heating and cooling system.",
     q_working:"Is the current system working?",
     q_cooling:"What cooling equipment does the home have now?",
-    q_heating:"Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?",
     q_age:"Approximate age of the system being replaced",
     q_lmi:"Low- and moderate-income households may be eligible for larger incentives. Do you think your household would qualify (income at or below 80% of the Lincoln Area Median Income)?",
     q_size:"Household size (optional)",
@@ -1040,7 +1031,6 @@ const STRINGS = {
     svy_intro:"Por favor responda algunas preguntas sobre el sistema actual de calefacción y enfriamiento de la propiedad.",
     q_working:"¿Funciona el sistema actual?",
     q_cooling:"¿Qué equipo de enfriamiento tiene la casa actualmente?",
-    q_heating:"¿También se reemplazará el equipo de calefacción (horno, calefactor de zócalo, caldera, etc.)?",
     q_age:"Edad aproximada del sistema que se reemplaza",
     q_lmi:"Los hogares de ingresos bajos y moderados pueden ser elegibles para incentivos más grandes. ¿Cree que su hogar calificaría (ingreso igual o inferior al 80% del ingreso medio del área de Lincoln)?",
     q_size:"Tamaño del hogar (opcional)",

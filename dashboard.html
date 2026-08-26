@@ -420,7 +420,6 @@ async function loadStats(token) {
   // below in patches 5/7, but this list was never updated to match).
   const QLABEL = {
     cooling_equipment: "What cooling equipment does the home have now?",
-    heating_also_replaced: "Is the heating equipment also being replaced?",
     is_system_working: "Is the current system working?",
     system_age: "System age",
     lmi_perceived: "Perceived income-tier qualification (household only)",
@@ -431,7 +430,6 @@ async function loadStats(token) {
   const VALLABEL = {
     cooling_equipment: { ac: "Air conditioner", heat_pump: "Heat pump", none: "None",
       central_ac: "Central AC (pre-launch)", window_ac: "Window AC (pre-launch)", not_sure: "Not sure (pre-launch)" },
-    heating_also_replaced: { yes: "Yes", no: "No", not_sure: "Not sure" },
     is_system_working: { working: "Working", not_working: "Not working", not_sure: "Not sure",
       partially_working: "Partially working" },
     lmi_perceived: { yes: "Yes", no: "No", not_sure: "Not sure" },
@@ -444,7 +442,6 @@ async function loadStats(token) {
   // "10-15 yrs", which reads as nonsense for an ordinal question.
   const VALORDER = {
     cooling_equipment: ["ac", "heat_pump", "none", "central_ac", "window_ac", "not_sure"],
-    heating_also_replaced: ["yes", "no", "not_sure"],
     is_system_working: ["working", "not_working", "partially_working", "not_sure"],
     system_age: ["0-4", "5-9", "10-14", "15-19", "20+", "unknown"],
     lmi_perceived: ["yes", "no", "not_sure"],

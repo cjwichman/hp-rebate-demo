@@ -255,13 +255,6 @@
       <option value="heat_pump" data-i18n="opt_heat_pump">Heat pump</option>
       <option value="none" data-i18n="opt_none">No cooling equipment</option>
     </select>
-    <label for="q-heating" data-i18n="q_heating">Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?</label>
-    <select id="q-heating">
-      <option value="" data-i18n="opt_choose">Choose one...</option>
-      <option value="yes" data-i18n="opt_yes">Yes</option>
-      <option value="no" data-i18n="opt_no">No</option>
-      <option value="not_sure" data-i18n="opt_not_sure">Not sure</option>
-    </select>
     <label for="q-age" data-i18n="q_age">Approximate age of the system being replaced</label>
     <select id="q-age">
       <option value="" data-i18n="opt_choose">Choose one...</option>
@@ -577,7 +570,6 @@ function choose(i) {
 $("btn-survey").addEventListener("click", () => {
   const answers = {
     cooling_equipment: $("q-cooling").value,
-    heating_also_replaced: $("q-heating").value,
     is_system_working: $("q-working").value,
     system_age: $("q-age").value,
   };
@@ -591,7 +583,7 @@ $("btn-survey").addEventListener("click", () => {
 // Survey answers describe one specific address - clear them any
 // time a new lookup begins so responses never carry over.
 function clearSurvey() {
-  ["q-cooling", "q-heating", "q-age", "q-working"].forEach(
+  ["q-cooling", "q-age", "q-working"].forEach(
     (id) => { $(id).value = ""; });
   $("err-survey").textContent = "";
 }
@@ -817,7 +809,6 @@ const STRINGS = {
     svy_intro:"Please answer a few questions about the existing heating and cooling system.",
     q_working:"Is the current system working?",
     q_cooling:"What cooling equipment does the home have now?",
-    q_heating:"Will the heating equipment (furnace, baseboard, boiler, etc.) also be replaced?",
     q_age:"Approximate age of the system being replaced",
     opt_choose:"Choose one...",
     opt_working:"Working",
@@ -827,8 +818,6 @@ const STRINGS = {
     opt_heat_pump:"Heat pump",
     opt_none:"No cooling equipment",
     opt_not_sure:"Not sure",
-    opt_yes:"Yes",
-    opt_no:"No",
     warn_none:"Installing a heat pump without replacing existing cooling equipment will not qualify for the City incentive. The LES incentive applies.",
     opt_unknown:"Don't know",
     btn_survey:"Look up incentive amounts",
@@ -917,7 +906,6 @@ const STRINGS = {
     svy_intro:"Por favor responda algunas preguntas sobre el sistema actual de calefacción y enfriamiento.",
     q_working:"¿Funciona el sistema actual?",
     q_cooling:"¿Qué equipo de enfriamiento tiene la casa actualmente?",
-    q_heating:"¿También se reemplazará el equipo de calefacción (horno, calefactor de zócalo, caldera, etc.)?",
     q_age:"Edad aproximada del sistema que se reemplaza",
     opt_choose:"Elija una opción...",
     opt_working:"Funciona",
@@ -927,8 +915,6 @@ const STRINGS = {
     opt_heat_pump:"Bomba de calor",
     opt_none:"Sin equipo de enfriamiento",
     opt_not_sure:"No estoy seguro",
-    opt_yes:"Sí",
-    opt_no:"No",
     warn_none:"Instalar una bomba de calor sin reemplazar equipo de enfriamiento existente no calificará para el incentivo de la Ciudad. El incentivo de LES aplica.",
     opt_unknown:"No sé",
     btn_survey:"Consultar montos de incentivo",
