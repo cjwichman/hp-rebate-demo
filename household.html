@@ -28,10 +28,6 @@
   h1 { font-family:var(--slab); font-size:24px; font-weight:700; color:var(--navy);
        letter-spacing:-0.01em; }
   .sub { color:var(--muted); font-size:14px; margin:6px 0 20px; }
-  .demo-banner { background:#fbecec; border:2px solid #8b1a1a; color:#8b1a1a;
-         padding:10px 14px; border-radius:9px; font-size:14px; text-align:center;
-         letter-spacing:.05em; text-transform:uppercase; font-weight:700;
-         margin-bottom:14px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
           padding:22px; margin-bottom:16px;
           box-shadow:0 1px 2px rgba(18,47,71,.05), 0 8px 24px rgba(18,47,71,.05); }
@@ -145,7 +141,6 @@
   <a id="home-link" href="index.html" data-i18n="home">&larr; Home</a>
   <a id="lang-toggle">Español (beta)</a>
 </div>
-<div class="demo-banner" data-i18n="demo">DEMO SYSTEM - incentive amounts are not final</div>
 
 <h1 data-i18n="title">City of Lincoln Heat Pump Incentives</h1>
 <p class="sub" id="subtitle" data-i18n="subtitle">Enter your address to see your eligible incentive amounts</p>
@@ -879,7 +874,6 @@ $("lmi-learn").addEventListener("click", () => {
 const STRINGS = {
   en: {
     home:"\u2190 Home",
-    demo:"DEMO SYSTEM - incentive amounts are not final",
     partners:"A partnership between the City of Lincoln and Lincoln Electric System",
     title:"City of Lincoln Heat Pump Incentives",
     subtitle:"Enter your address to see your eligible incentive amounts",
@@ -972,7 +966,6 @@ const STRINGS = {
   },
   es: {
     home:"\u2190 Inicio",
-    demo:"SISTEMA DE DEMOSTRACIÓN - los montos de incentivos no son definitivos",
     partners:"Una colaboración entre la Ciudad de Lincoln y Lincoln Electric System",
     title:"Incentivos de Bomba de Calor de la Ciudad de Lincoln",
     subtitle:"Ingrese su dirección para ver los montos de incentivo elegibles",
