@@ -154,6 +154,7 @@
       <div class="stat"><div class="n" id="s-nomatch">-</div><div class="l">Searches with no eligible match<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Searches where nothing in the study address list matched what was typed.</span></span></div></div>
       <div class="stat"><div class="n" id="s-codes">-</div><div class="l">Verification codes requested<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a visitor submitted an email to receive a verification code.</span></span></div></div>
       <div class="stat"><div class="n" id="s-reveals">-</div><div class="l">Incentive amounts viewed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Completed reveals (events). The same address viewed twice counts twice. The core household outcome.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed verification codes<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a household entered a code that did not match or had expired.</span></span></div></div>
     </div>
   </div>
 
@@ -168,18 +169,25 @@
   </div>
 
   <div class="card">
-    <h2>Incentive amounts viewed, by assignment</h2>
-    <div class="grid">
-      <div class="stat"><div class="n" id="s-standard">-</div><div class="l">Standard arm viewed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Reveals for addresses randomized to the Standard (lower) incentive arm.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-enhanced">-</div><div class="l">Enhanced arm viewed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Reveals for addresses randomized to the Enhanced (higher) incentive arm.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-contractor">-</div><div class="l">Contractor lookups<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Completed lookups (events). The same address looked up twice counts twice - see distinct addresses below.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-co-standard">-</div><div class="l">Contractor lookups, Standard<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Contractor lookups of addresses in the Standard arm.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-co-enhanced">-</div><div class="l">Contractor lookups, Enhanced<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Contractor lookups of addresses in the Enhanced arm.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-prem-hh">-</div><div class="l">Distinct addresses, household<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Unique addresses revealed by households, counting repeat views once.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-prem-co">-</div><div class="l">Distinct addresses, contractor<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Unique addresses looked up by contractors, counting repeats once. Overlaps with the household count when both channels checked the same address.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-multi">-</div><div class="l">Emails viewing 2+ addresses<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Distinct emails that revealed more than one address, such as a household checking their own home and a relative's.</span></span></div></div>
-      <div class="stat"><div class="n" id="s-codefail">-</div><div class="l">Failed verification codes<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Times a household entered a code that did not match or had expired.</span></span></div></div>
-    </div>
+    <h2>Views, by channel and assignment</h2>
+    <p class="muted">Completed views (events). The same address viewed twice counts twice.</p>
+    <table class="dist">
+      <tr><th></th><th>Standard</th><th>Enhanced</th><th>Total</th></tr>
+      <tr><td>Household reveals</td><td id="ev-hh-s">-</td><td id="ev-hh-e">-</td><td id="ev-hh-t">-</td></tr>
+      <tr><td>Contractor lookups</td><td id="ev-co-s">-</td><td id="ev-co-e">-</td><td id="ev-co-t">-</td></tr>
+      <tr><td>All</td><td id="ev-all-s">-</td><td id="ev-all-e">-</td><td id="ev-all-t">-</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Distinct addresses, by channel and assignment</h2>
+    <p class="muted">Unique addresses, repeats counted once. "All" rows are not sums: an address checked by both a household and a contractor counts once.</p>
+    <table class="dist">
+      <tr><th></th><th>Standard</th><th>Enhanced</th><th>Total</th></tr>
+      <tr><td>Via household</td><td id="pr-hh-s">-</td><td id="pr-hh-e">-</td><td id="pr-hh-t">-</td></tr>
+      <tr><td>Via contractor</td><td id="pr-co-s">-</td><td id="pr-co-e">-</td><td id="pr-co-t">-</td></tr>
+      <tr><td>All (union)</td><td id="pr-all-s">-</td><td id="pr-all-e">-</td><td id="pr-all-t">-</td></tr>
+    </table>
   </div>
 
   <div class="card">
@@ -189,6 +197,7 @@
       <div class="stat"><div class="n" id="s-prem-revealed">-</div><div class="l">Premises revealed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Distinct addresses revealed at least once, by a household or a contractor.</span></span></div></div>
       <div class="stat"><div class="n" id="s-prem-repeat">-</div><div class="l">Premises revealed 2+ times<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Addresses revealed more than once. Includes refreshes and a contractor looking up an address a household already checked.</span></span></div></div>
       <div class="stat"><div class="n" id="s-sugg-never">-</div><div class="l">Suggested, never revealed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Addresses that appeared in search suggestions but were never selected and verified.</span></span></div></div>
+      <div class="stat"><div class="n" id="s-multi">-</div><div class="l">Emails viewing 2+ addresses<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Distinct emails that revealed more than one address, such as a household checking their own home and a relative's.</span></span></div></div>
       <div class="stat"><div class="n" id="s-sel-never">-</div><div class="l">Selected, never revealed<span class="info" tabindex="0"><span class="info-i">i</span><span class="info-tip">Addresses a visitor selected but never finished verifying, such as abandoning before entering a code.</span></span></div></div>
     </div>
   </div>
@@ -409,15 +418,25 @@ async function loadStats(token) {
   $("c-lookups").textContent = d.contractor_lookups ?? "-";
   $("s-codes").textContent = d.codes_sent;
   $("s-reveals").textContent = d.reveals;
-  $("s-standard").textContent = d.reveals_standard;
-  $("s-enhanced").textContent = d.reveals_enhanced;
-  $("s-contractor").textContent = d.contractor_lookups;
-  $("s-co-standard").textContent = d.contractor_lookups_standard ?? "-";
-  $("s-co-enhanced").textContent = d.contractor_lookups_enhanced ?? "-";
-  $("s-prem-hh").textContent = d.premises_household ?? "-";
-  $("s-prem-co").textContent = d.premises_contractor ?? "-";
   $("s-multi").textContent = d.multi_address_emails ?? "-";
   $("s-codefail").textContent = d.codes_failed;
+  const am = d.assignment_matrix;
+  if (am) {
+    const ev = am.events, pr = am.premises;
+    const put = (id, v) => { $(id).textContent = v; };
+    const hhS = ev.household.Standard, hhE = ev.household.Enhanced;
+    const coS = ev.contractor.Standard, coE = ev.contractor.Enhanced;
+    put("ev-hh-s", hhS); put("ev-hh-e", hhE); put("ev-hh-t", hhS + hhE);
+    put("ev-co-s", coS); put("ev-co-e", coE); put("ev-co-t", coS + coE);
+    put("ev-all-s", hhS + coS); put("ev-all-e", hhE + coE);
+    put("ev-all-t", hhS + hhE + coS + coE);
+    put("pr-hh-s", pr.Standard.household); put("pr-hh-e", pr.Enhanced.household);
+    put("pr-hh-t", pr.all.household);
+    put("pr-co-s", pr.Standard.contractor); put("pr-co-e", pr.Enhanced.contractor);
+    put("pr-co-t", pr.all.contractor);
+    put("pr-all-s", pr.Standard.all); put("pr-all-e", pr.Enhanced.all);
+    put("pr-all-t", pr.all.all);
+  }
 
   $("s-prem-revealed").textContent = d.premises_revealed ?? "-";
   $("s-prem-repeat").textContent = d.premises_revealed_repeat ?? "-";
