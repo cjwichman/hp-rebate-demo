@@ -103,9 +103,10 @@
 <div class="card hidden" id="forgot">
   <div class="field"><label for="fp-email">Email</label>
   <input id="fp-email" type="email" autocomplete="username"></div>
-  <button id="btn-forgot">Send reset link</button>
+  <button id="btn-forgot">Send reset code</button>
   <div class="error" id="err-forgot"></div>
-  <div class="ok hidden" id="ok-forgot">If that email has an account, a reset link is on its way.</div>
+  <div class="ok hidden" id="ok-forgot">If that email has an account, a 6-digit reset code is on its way.
+    <a id="forgot-goto" href="reset.html?from=dashboard">Enter your code</a></div>
   <p class="switch"><a id="forgot-to-login">Log in</a></p>
 </div>
 
@@ -307,6 +308,8 @@ $("btn-forgot").addEventListener("click", async () => {
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
     body: JSON.stringify({ email }),
   }).catch(() => {});
+  $("forgot-goto").href =
+    `reset.html?from=dashboard&email=${encodeURIComponent(email)}`;
   $("ok-forgot").classList.remove("hidden");
 });
 

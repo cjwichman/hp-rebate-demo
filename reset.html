@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Set a new password - Heat Pump Rebates</title>
+<title>Set a new password - Heat Pump Incentives</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -44,8 +44,14 @@
 <h1>Set a new password</h1>
 
 <div class="card" id="form-card">
-  <div id="pre-check" class="muted">Checking your reset link...</div>
-  <div class="hidden" id="form">
+  <p class="muted" style="margin-bottom:14px" id="intro">Enter the 6-digit code
+    from the reset email, then choose a new password. The code works for one
+    hour. If it expires, request a new one from the login page.</p>
+  <div id="form">
+    <label for="rp-email">Email address</label>
+    <input id="rp-email" type="email" autocomplete="email">
+    <label for="rp-code">6-digit reset code</label>
+    <input id="rp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
     <label for="pw1">New password (8+ characters)</label>
     <input id="pw1" type="password" autocomplete="new-password">
     <label for="pw2">Confirm password</label>
@@ -66,49 +72,58 @@ const SUPABASE_URL = "https://ecxxsshpadeqwtmijvso.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_F3iQnGjyCdMUXIhHuAalkg_5_Tqo8gX";
 const $ = (id) => document.getElementById(id);
 
-// Supabase's recovery link lands here with the token in the URL
-// fragment (#access_token=...&type=recovery), not the query string.
-const params = new URLSearchParams(location.hash.replace(/^#/, ""));
-const accessToken = params.get("access_token");
-const linkType = params.get("type");
+// Reset emails carry a 6-digit code rather than a link. Corporate
+// mail scanners open links in incoming mail, and each recovery link
+// is single-use, so link-based resets arrived dead for users behind
+// such filters (LES among them). A code in the message text cannot
+// be consumed by a scanner. The code plus the account email are
+// exchanged for a session below, which then sets the password.
 
 // Which login page to return to. "from=dashboard" is added when the
 // reset request originated on the dashboard's forgot-password link;
 // contractor is the default since it's the more common channel.
-const fromParam = new URLSearchParams(location.search).get("from");
-$("back-link").href = fromParam === "dashboard" ? "dashboard.html" : "contractor.html";
+const query = new URLSearchParams(location.search);
+$("back-link").href = query.get("from") === "dashboard" ? "dashboard.html" : "contractor.html";
 
-if (!accessToken || linkType !== "recovery") {
-  $("pre-check").textContent =
-    "This link is invalid or has expired. Request a new password reset link from the login page.";
-} else {
-  $("pre-check").classList.add("hidden");
-  $("form").classList.remove("hidden");
-}
-
-// Strip the token from the URL immediately after reading it. The
-// fragment is never sent over the network (browsers don't include it
-// in the Referer header), but it would otherwise sit in the address
-// bar and browser history indefinitely.
-history.replaceState(null, "", location.pathname + location.search);
+// The login page passes the email along so it doesn't need retyping.
+if (query.get("email")) $("rp-email").value = query.get("email");
 
 $("btn-save").addEventListener("click", async () => {
   $("err").textContent = "";
+  const email = $("rp-email").value.trim();
+  const code = $("rp-code").value.trim();
   const pw1 = $("pw1").value, pw2 = $("pw2").value;
+  if (!email) { $("err").textContent = "Enter your email address."; return; }
+  if (!/^\d{6}$/.test(code)) { $("err").textContent = "Enter the 6-digit code from the email."; return; }
   if (pw1.length < 8) { $("err").textContent = "Password must be at least 8 characters."; return; }
   if (pw1 !== pw2) { $("err").textContent = "Passwords do not match."; return; }
   $("btn-save").disabled = true;
 
+  // Exchange email + code for a short-lived session.
+  const v = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ type: "recovery", email, token: code }),
+  });
+  if (!v.ok) {
+    $("btn-save").disabled = false;
+    $("err").textContent =
+      "That code is invalid or has expired. Request a new one from the login page.";
+    return;
+  }
+  const session = await v.json();
+
+  // Set the new password with the session just issued.
   const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     method: "PUT",
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY,
-               Authorization: `Bearer ${accessToken}` },
+               Authorization: `Bearer ${session.access_token}` },
     body: JSON.stringify({ password: pw1 }),
   });
   $("btn-save").disabled = false;
   if (!r.ok) {
     const e = await r.json().catch(() => ({}));
-    $("err").textContent = e.error_description || e.msg || "Could not set password. Request a new reset link.";
+    $("err").textContent = e.error_description || e.msg || "Could not set password. Request a new code.";
     return;
   }
   $("form-card").classList.add("hidden");

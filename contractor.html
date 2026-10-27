@@ -153,9 +153,10 @@
 <div class="card hidden" id="forgot">
   <div class="field"><label for="fp-email" data-i18n="li_email">Email</label>
   <input id="fp-email" type="email" autocomplete="username"></div>
-  <button id="btn-forgot" data-i18n="btn_forgot">Send reset link</button>
+  <button id="btn-forgot" data-i18n="btn_forgot">Send reset code</button>
   <div class="error" id="err-forgot"></div>
-  <div class="ok hidden" id="ok-forgot" data-i18n="forgot_sent">If that email has an account, a reset link is on its way.</div>
+  <div class="ok hidden" id="ok-forgot"><span data-i18n="forgot_sent">If that email has an account, a 6-digit reset code is on its way.</span>
+    <a id="forgot-goto" href="reset.html" data-i18n="forgot_goto">Enter your code</a></div>
   <p class="switch"><a id="forgot-to-login" data-i18n="btn_login">Log in</a></p>
 </div>
 
@@ -404,6 +405,7 @@ $("btn-forgot").addEventListener("click", async () => {
     headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
     body: JSON.stringify({ email }),
   }).catch(() => {});
+  $("forgot-goto").href = `reset.html?email=${encodeURIComponent(email)}`;
   $("ok-forgot").classList.remove("hidden");
 });
 
@@ -774,8 +776,9 @@ const STRINGS = {
     no_account:"No account?",
     to_signup:"Create one",
     forgot_pw:"Forgot password?",
-    btn_forgot:"Send reset link",
-    forgot_sent:"If that email has an account, a reset link is on its way.",
+    btn_forgot:"Send reset code",
+    forgot_sent:"If that email has an account, a 6-digit reset code is on its way.",
+    forgot_goto:"Enter your code",
     change_pw:"Change password",
     log_out:"Log out",
     cp_h:"Change your password",
@@ -870,8 +873,9 @@ const STRINGS = {
     no_account:"¿No tiene cuenta?",
     to_signup:"Crear una",
     forgot_pw:"¿Olvidó su contraseña?",
-    btn_forgot:"Enviar enlace para restablecer la contraseña",
-    forgot_sent:"Si ese correo tiene una cuenta, un enlace para restablecer la contraseña está en camino.",
+    btn_forgot:"Enviar código de restablecimiento",
+    forgot_sent:"Si ese correo tiene una cuenta, un código de restablecimiento de 6 dígitos está en camino.",
+    forgot_goto:"Ingrese su código",
     change_pw:"Cambiar contraseña",
     log_out:"Cerrar sesión",
     cp_h:"Cambiar su contraseña",
