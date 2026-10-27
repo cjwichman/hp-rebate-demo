@@ -142,7 +142,11 @@
 </div>
 
 <div class="hidden" id="dash">
-  <p class="muted" style="margin:-8px 0 16px">Full history. Refresh the page to update.
+  <div id="trunc-banner" class="hidden" style="background:#fbecec;border:2px solid #8b1a1a;color:#8b1a1a;padding:10px 14px;border-radius:9px;font-weight:600;margin:0 0 14px">
+  Data volume has exceeded the dashboard's 20,000-event fetch cap. Counts below
+  cover the most recent 20,000 events only and understate totals. Switch the
+  dashboard to SQL-side aggregation.</div>
+<p class="muted" style="margin:-8px 0 16px"><span id="window-label">Full history.</span> Refresh the page to update.
     <a id="to-changepw" style="color:var(--navy); cursor:pointer; margin-left:10px">Change password</a>
     <a id="btn-logout" style="color:var(--navy); cursor:pointer; margin-left:10px">Log out</a></p>
   <div class="card">
@@ -408,6 +412,10 @@ async function loadStats(token) {
   $("signup").classList.add("hidden");
   $("dash").classList.remove("hidden");
 
+  if (d.data_truncated) {
+    $("trunc-banner").classList.remove("hidden");
+    $("window-label").textContent = "Most recent 20,000 events only.";
+  }
   const bc = d.by_channel ?? {};
   const hh = (k) => bc[k]?.household ?? "-";
   const co = (k) => bc[k]?.contractor ?? "-";
